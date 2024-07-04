@@ -1,0 +1,105 @@
+# Run this script first, it prepares data for further analyses.
+
+rm( list = ls() ) # clear environment
+
+library(here)
+library(openxlsx)
+library(tidyverse)
+
+# DATA ----
+
+mfile <- here("_raw","COSACTIW_DCERA-aktivity2.xlsx") # file with mapping
+dfile <- here("_raw","COSACTIW_MATKA-dbf-paw_sport_garden_walking.xlsx") # file with data
+
+# activities mapping
+map <-
+  read.xlsx( mfile, sheet = "Sheet 1" ) %>%
+  select(type, activity, category)
+
+# demography
+dem <-
+  read.xlsx( dfile, sheet = "1ID_DATE_AGE_SCREENING_Demogr" ) %>%
+  filter( `Was_the_examination_valid?` == 1 ) %>%
+  rename(
+    "Age_years" = "Age",
+    "Education_years" = "Number_of_years_of_study",
+    "Education_level" = "Highest_education_level",
+    "Subjective_age_years" = "Subjective_age_number"
+  ) %>%
+  mutate(
+    PA = factor(
+      PA,
+      levels = 1:6,
+      labels = c(
+        "I'm an athletic person",
+        "I enjoy movement/exercise",
+        "I exercised at least 3 times a week",
+        "I don't avoid movement/exercise",
+        "I'm not an athletic person",
+        "I had to stop doing sports (Injury)"
+      )
+    ),
+    Education_level = factor(
+      Education_level,
+      levels = 1:4,
+      labels = c(
+        "Primary school",
+        "Vocational school (OU)",
+        "Secondary school",
+        "College/university"
+      ),
+      ordered = T
+    )
+  ) %>%
+  select(ID, Age_years, Subjective_age_years, Education_years, Education_level, PA, FAQ, MMSE)
+
+# cognition
+cog <-
+  read.xlsx( dfile, sheet = "3COGNITIVE_TESTS" ) %>%
+  mutate(
+    SA = factor(
+      `SA_New-BNT-TMT`,
+      levels = 1:2,
+      labels = c(
+        "SA",
+        "nonSA"
+      )
+    ),
+    PA = factor(
+      `WHO-PA`,
+      levels = 0:1,
+      labels = c(
+        "nonPA",
+        "PA"
+      )
+    )
+  ) %>%
+  select(ID, SA, PA) %>%
+  filter(ID %in% dem$ID)
+
+# activities
+act <-
+  read.xlsx( dfile, sheet = "5RETROS-LEISURE_ACTIVITIES" ) %>%
+  mutate(
+    Activity = if_else(Activity == "theathre", "theatre", Activity),
+    Activity_type = case_when(
+      Activity == "reading" ~ "mental",
+      Activity == "theatre" ~ "mental",
+      Activity == "self_education" ~ "mental",
+      .default = Activity_type
+    ),
+    Seasonal = if_else(Intensity >= 10, T, F),
+    Intensity = factor(
+      Intensity %% 10, # modulo 10 to pool seasonal
+      levels = c(0:5),
+      labels = c(
+        "do not know",
+        "occasionally or not at all",
+        "several times a month",
+        "once a week",
+        "several times a week",
+        "every day or nearly every day"
+      )
+    )
+  ) %>%
+  filter(ID %in% dem$ID)

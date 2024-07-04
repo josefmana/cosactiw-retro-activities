@@ -1,2 +1,9 @@
 # cosactiw-retro-activities
-Analysing self-reported physical and mental activities during adulthood in lifelong physically active elderly ladies with respect to their cognitive super-aging status based on neuropsychological tests
+
+The [renv](https://rstudio.github.io/renv/) package was used to create reproducible environment for the project. To set-up R environment for reproduction of our results, run:
+
+```
+install.packages("renv")
+renv::restore()
+```
+
