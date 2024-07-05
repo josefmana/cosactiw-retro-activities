@@ -6,15 +6,15 @@ library(here)
 library(openxlsx)
 library(tidyverse)
 
-# DATA ----
-
 mfile <- here("_raw","COSACTIW_DCERA-aktivity2.xlsx") # file with mapping
 dfile <- here("_raw","COSACTIW_MATKA-dbf-paw_sport_garden_walking.xlsx") # file with data
 
 # activities mapping
 map <-
   read.xlsx( mfile, sheet = "Sheet 1" ) %>%
-  select(type, activity, category)
+  select(type, category, activity) %>%
+  add_row(type = "physical", category = "flexibility_health_exercise", activity = "chi_kung") %>%
+  arrange(type, category, activity)
 
 # demography
 dem <-
@@ -65,7 +65,7 @@ cog <-
         "nonSA"
       )
     ),
-    PA = factor(
+    WHO_PA = factor(
       `WHO-PA`,
       levels = 0:1,
       labels = c(
@@ -74,7 +74,7 @@ cog <-
       )
     )
   ) %>%
-  select(ID, SA, PA) %>%
+  select(ID, SA, WHO_PA) %>%
   filter(ID %in% dem$ID)
 
 # activities
@@ -100,6 +100,11 @@ act <-
         "several times a week",
         "every day or nearly every day"
       )
-    )
+    ),
+    Category = unlist( sapply( 1:nrow(.), function(i) map[map$activity == Activity[i], "category"] ), use.names = F )
   ) %>%
   filter(ID %in% dem$ID)
+
+# save the outcomes as .rds
+saveRDS( list(dem = dem, cog = cog, act = act, map = map), file = here("_data.rds") )
+
