@@ -107,4 +107,3 @@ act <-
 
 # save the outcomes as .rds
 saveRDS( list(dem = dem, cog = cog, act = act, map = map), file = here("_data.rds") )
-
