@@ -1,19 +1,13 @@
-# Use this script to address research questions regarding retrospectively remembered activities with respect to cognitive SA.
+# Use this script to describe retrospectively remembered activities with respect to cognitive SA
 
 rm( list = ls() ) # clear environment
-options( mc.cores = parallel::detectCores() ) # set-up multiple cores
 
 library(here)
-library(openxlsx)
 library(tidyverse)
 library(effsize)
-library(brms)
-library(bayesplot)
 
-color_scheme_set("viridisA")
 theme_set( theme_bw(base_size = 12) )
-
-sapply( c("figs","tabs","mods"), function(i) if( !dir.exists(i) ) dir.create(i) ) # prepare folders
+sapply( c("figures","tables","models"), function(i) if( !dir.exists(i) ) dir.create(i) ) # prepare folders
 
 
 # UTILS ----
@@ -29,7 +23,7 @@ msd <- function(x, d = 2) paste0( rprint( mean(x, na.rm = T), d ), " ± ", rprin
 # read them
 for ( i in names( readRDS("_data.rds") ) ) assign( i, readRDS("_data.rds")[[i]] )
 
-# prepare a wide data set with all activites and their counts disregarding intensity and seasoness
+# prepare a wide data set with all activities and their counts disregarding intensity and seasoness
 d1 <- lapply(
   
   setNames( c("all","non-seasonal","seasonal"), c("all","non-seasonal","seasonal") ),
@@ -52,7 +46,7 @@ d1 <- lapply(
     
     as.data.frame() %>%
     mutate(
-      activities = rowSums( across( everything() ) ), # sum all activities per patients
+      activities = rowSums( across( everything() ) ), # sum all activities per participant
       !!!setNames(rep( NA, length( unique(map$type) ) ), unique( map$type) ),
       !!!setNames(rep( NA, length( unique(map$category) ) ), unique( map$category) ),
       across( unique(map$type), ~ rowSums( across( all_of( map[map$type == cur_column(), "activity"] ) ) ) ),
@@ -83,7 +77,8 @@ n <- sapply( c("SA","nonSA"), function(i) nrow( subset(d1$all, SA == i) ) )
 
 ## TABLES ----
 
-### table for activity frequencies per SA status ----
+### table of activity frequencies per SA status ----
+
 tab1 <- lapply(
   
   c( "activities", unique(map$type), unique(map$category) ),
@@ -166,7 +161,7 @@ tab1 <- sapply(
   mutate( across( everything(), ~ case_when( grepl("NaN",.x) ~ "-", is.na(.x) ~ "-", .default = .x ) ) )
 
 # save the table as .csv
-write.table(x = tab1, file = here("tabs","activities_frequencies.csv"), sep = ";", row.names = F, quote = F)
+write.table(x = tab1, file = here("tables","activities_frequencies.csv"), sep = ";", row.names = F, quote = F)
 
 
 ### tables of frequencies of participants reporting at least one activity in a category ----
@@ -186,9 +181,10 @@ lapply(
     t() %>%
     as.data.frame() %>%
     mutate( Type = unlist(sapply( rownames(.), function(i) with( map, unique( type[category == i] ) ) ), use.names = F), .before = 1 ) %>%
+    mutate( across(ends_with("SA"), ~ paste0(.x, " (", rprint( 100 * .x/n[cur_column()], 0),"%)"), .names = "{col}_perc") ) %>%
     rownames_to_column("Category") %>%
     write.table(
-      file = here( "tabs", paste0(x,"_activity_categories_reports.csv") ),
+      file = here( "tables", paste0(x,"_activity_categories_reports.csv") ),
       sep = ",",
       row.names = F,
       quote = F
@@ -248,7 +244,7 @@ lapply(
     # save it
     ggsave(
       plot = last_plot(),
-      filename = here( "figs", paste0(x,"_activity_categories_frequencies.jpg") ),
+      filename = here( "figures", paste0(x,"_activity_categories_frequencies.jpg") ),
       dpi = 300,
       width = 12.6,
       height = 13.3
@@ -299,7 +295,7 @@ lapply(
     # save it
     ggsave(
       plot = last_plot(),
-      filename = here( "figs", paste0(x,"_activitiy_categories_reports.jpg") ),
+      filename = here( "figures", paste0(x,"_activitiy_categories_reports.jpg") ),
       dpi = 300,
       width = 10,
       height = 10.6
@@ -355,7 +351,7 @@ lapply(
     # save it
     ggsave(
       plot = last_plot(),
-      filename = here( "figs", paste0("_",x,"_single_activities_reports.jpg") ),
+      filename = here( "figures", paste0("_",x,"_single_activities_reports.jpg") ),
       dpi = 300,
       width = 10,
       height = 30.6
@@ -364,110 +360,3 @@ lapply(
   }
 )
 
-
-## MODELS ----
-
-# prepare data for a GLMM
-d2 <- d1$all %>%
-  select( ID, SA, all_of(map$category) ) %>%
-  pivot_longer(
-    cols = all_of(map$category),
-    values_to = "Frequency",
-    names_to = "Category"
-  ) %>%
-  mutate(
-    Type =
-      unlist(
-        sapply( 1:nrow(.), function(i) with( map, unique( type[category == Category[i]] ) ) ),
-        use.names = F
-      ),
-    .before = Category
-  )
-
-# zero-inflated Poisson model
-fit0poiss <- brm(
-  formula = Frequency ~ 1 + (1 | ID) + (1 + SA || Type / Category),
-  family = zero_inflated_poisson(link = "log", link_zi = "logit"),
-  prior = NULL,
-  data = d2,
-  file = here("mods","frequencies_zero_inflated_poisson.rds")
-)
-
-# zero-inflated Negative-Binomial model
-fit0negbin <- brm(
-  formula = Frequency ~ 1 + (1 | ID) + (1 + SA || Type / Category),
-  family = zero_inflated_negbinomial(link = "log", link_shape = "log", link_zi = "logit"),
-  prior = NULL,
-  data = d2,
-  file = here("mods","frequencies_zero_inflated_negbin.rds")
-)
-
-
-# INTENSITIES ----
-
-# prepare data
-d3 <- act %>%
-  filter( complete.cases(Intensity) ) %>%
-  mutate(
-    Intensity = as.integer( if_else(Intensity == "do not know", NA, Intensity) ),
-    logIntensity = log( as.numeric(Intensity)-1 ),
-    Time_bin = factor(Time_bin, levels = unique(act$Time_bin), ordered = T)
-  ) %>%
-  left_join(cog)
-
-
-## EXPLORATION ----
-
-### GAUSSIAN ----
-
-# fit a Gaussian model on log intensities and explore its posterior predictions w.r.t. data
-fit0 <- brm(
-  
-  formula = logIntensity ~ 1 + (1 | ID) + (1 | Activity_type / Category) + (1 | Time_bin),
-  family = gaussian(link = "identity"),
-  prior = NULL,
-  data = d3,
-  file = here("mods","explore_gauss.rds")
-  
-)
-
-# convergence soft check
-plot(fit0)
-
-# some posterior checks per activity category
-brms::pp_check(fit0, type = "dens_overlay_grouped", group = "Activity_type:Category", ndraws = 100) # missing mark
-brms::pp_check(fit0, type = "stat_grouped", group = "Activity_type:Category", stat = "mean") # good
-brms::pp_check(fit0, type = "stat_grouped", group = "Activity_type:Category", stat = "median") # missed most of them
-brms::pp_check(fit0, type = "stat_grouped", group = "Activity_type:Category", stat = "sd") # missed most of them
-
-# the model misses mean of logIntensity for seasonal activities in a variable-specific way
-pp_check(
-  object = c( na.omit(d3$logIntensity) ),
-  yrep = posterior_predict( fit0, newdata = na.omit(d3) ),
-  fun = ppc_stat_grouped,
-  stat = "mean",
-  group = na.omit(d3)$Seasonal
-)
-
-# on the other hand, the model get mean of logIntensity for SA vs non-SA subjects similarly well
-pp_check(
-  object = c( na.omit(d3$logIntensity) ),
-  yrep = posterior_predict( fit0, newdata = na.omit(d3) ),
-  fun = ppc_stat_grouped,
-  stat = "mean",
-  group = na.omit(d3)$SA
-)
-
-
-### ORDERED LOGIT ----
-
-# fit a Gaussian model on log intensities and explore its posterior predictions w.r.t. data
-fit1 <- brm(
-
-  formula = Intensity ~ 1 + (1 | ID) + (1 | Activity_type / Category) + (1 | Time_bin),
-  family = cumulative(link = "logit"),
-  prior = NULL,
-  data = d3,
-  file = here("mods","explore_logit.rds")
-  
-)

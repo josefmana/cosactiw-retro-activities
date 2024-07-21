@@ -1,5 +1,5 @@
 # files not supposed to be shared
-mods/**/*.rds
+models/**/*.rds
 **/.DS_Store
 **/*.docx
 **/*.pages
