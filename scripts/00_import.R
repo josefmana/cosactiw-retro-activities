@@ -7,7 +7,7 @@ library(openxlsx)
 library(tidyverse)
 
 mfile <- here("_raw","COSACTIW_DCERA-aktivity2.xlsx") # file with mapping
-dfile <- here("_raw","COSACTIW_MATKA-dbf-paw_sport_garden_walking.xlsx") # file with data
+dfile <- here("_raw","COSACTIW_NANOK_pro-jamovi.xlsx") # file with data
 
 # activities mapping
 map <-
@@ -19,12 +19,13 @@ map <-
 # demography
 dem <-
   read.xlsx( dfile, sheet = "1ID_DATE_AGE_SCREENING_Demogr" ) %>%
-  filter( `Was_the_examination_valid?` == 1 ) %>%
+  #filter( `Was_the_examination_valid?` == 1 ) %>%
   rename(
     "Age_years" = "Age",
     "Education_years" = "Number_of_years_of_study",
     "Education_level" = "Highest_education_level",
-    "Subjective_age_years" = "Subjective_age_number"
+    "Subjective_age_years" = "Subjective_age_number",
+    "Valid" = "Was_the_examination_valid?"
   ) %>%
   mutate(
     PA = factor(
@@ -51,7 +52,7 @@ dem <-
       ordered = T
     )
   ) %>%
-  select(ID, Age_years, Subjective_age_years, Education_years, Education_level, PA, FAQ, MMSE)
+  select(ID, Valid, Age_years, Subjective_age_years, Education_years, Education_level, PA, FAQ, MMSE)
 
 # cognition
 cog <-
@@ -74,8 +75,13 @@ cog <-
       )
     )
   ) %>%
-  select(ID, SA, WHO_PA) %>%
+  select(ID, SA, WHO_PA, `RAVLT_1-5`, RAVLT_delayed_recall, TMT_A_time, TMT_B_time, Spon_sem, VF_animals) %>%
   filter(ID %in% dem$ID)
+
+# Cobra-A
+cobra <-
+  read.xlsx( dfile, sheet = "6COBRA-B-PA" ) %>%
+  select( -contains("PA") )
 
 # activities
 act <-
@@ -106,4 +112,4 @@ act <-
   filter(ID %in% dem$ID)
 
 # save the outcomes as .rds
-saveRDS( list(dem = dem, cog = cog, act = act, map = map), file = here("_data.rds") )
+saveRDS( list(dem = dem, cog = cog, act = act, cobra = cobra, map = map), file = here("_data.rds") )

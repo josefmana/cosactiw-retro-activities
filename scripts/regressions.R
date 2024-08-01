@@ -10,14 +10,10 @@ library(bayesplot)
 
 color_scheme_set("viridisA")
 theme_set( theme_bw(base_size = 12) )
+source( here("scripts","utils.R") ) # in-house functions
 
 sapply( c("figures","tables","models"), function(i) if( !dir.exists(i) ) dir.create(i) ) # prepare folders
 
-
-# UTILS ----
-
-rprint <- function(x, d = 2) sprintf( paste0("%.",d,"f"), round(x, d) )
-msd <- function(x, d = 2) paste0( rprint( mean(x, na.rm = T), d ), " ± ", rprint( sd(x, na.rm = T), d ) )
 
 # DATA ----
 
