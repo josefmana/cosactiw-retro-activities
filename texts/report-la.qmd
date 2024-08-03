@@ -1,0 +1,9 @@
+---
+title: "Leisure activities in sporty old ladies"
+author: "Josef Mana"
+date: "`r Sys.Date()`"
+format: pdf
+warning: false
+echo: false
+---
+

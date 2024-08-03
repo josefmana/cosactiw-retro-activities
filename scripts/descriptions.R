@@ -16,7 +16,7 @@ source( here("scripts","utils.R") ) # in-house functions
 # read them
 for ( i in names( readRDS("_data.rds") ) ) assign( i, readRDS("_data.rds")[[i]] )
 
-# prepare a wide data set with all activities and their counts disregarding intensity and seasoness
+# prepare a wide data set with all activities and their counts disregarding reported intensity
 d1 <- lapply(
   
   setNames( c("all","non-seasonal","seasonal"), c("all","non-seasonal","seasonal") ),
@@ -70,8 +70,7 @@ n <- sapply( c("SA","nonSA"), function(i) nrow( subset(d1$all, SA == i) ) )
 
 ## TABLES ----
 
-### table of activity frequencies per SA status ----
-
+### table of activity counts per SA status ----
 tab1 <- lapply(
   
   c( "activities", unique(map$type), unique(map$category) ),
@@ -154,10 +153,10 @@ tab1 <- sapply(
   mutate( across( everything(), ~ case_when( grepl("NaN",.x) ~ "-", is.na(.x) ~ "-", .default = .x ) ) )
 
 # save the table as .csv
-write.table(x = tab1, file = here("tables","activities_frequencies.csv"), sep = ";", row.names = F, quote = F)
+write.table(x = tab1, file = here("tables","activities_counts.csv"), sep = ";", row.names = F, quote = F)
 
 
-### tables of frequencies of participants reporting at least one activity in a category ----
+### tables of counts of participants reporting at least one activity in a category ----
 
 # for all of them, Chi-square based p > .05
 lapply(
@@ -188,7 +187,7 @@ lapply(
 
 ## FIGURES ----
 
-### plot individual-level frequencies per seasonal/non-seasonal categories ----
+### plot individual-level counts per seasonal/non-seasonal categories ----
 lapply(
   
   names(d1),
@@ -224,7 +223,7 @@ lapply(
         y = NULL,
         title = paste0("Per-participant leisure activity categories report (", x, " activities)"),
         subtitle = paste0(
-          "Bars show frequency (y-axis) of the number of activities (x-axis) reported by ", n["SA"], " SA and ", n["nonSA"], " non-SA participants."
+          "Bars show counts (y-axis) of the number of activities (x-axis) reported by ", n["SA"], " SA and ", n["nonSA"], " non-SA participants."
         )
       ) +
       theme(
@@ -237,7 +236,7 @@ lapply(
     # save it
     ggsave(
       plot = last_plot(),
-      filename = here( "figures", paste0(x,"_activity_categories_frequencies.jpg") ),
+      filename = here( "figures", paste0(x,"_activity_categories_counts.jpg") ),
       dpi = 300,
       width = 12.6,
       height = 13.3
@@ -247,7 +246,7 @@ lapply(
 )
 
 
-### plot sample-level frequencies per seasonal/non-seasonal categories ----
+### plot sample-level counts per seasonal/non-seasonal categories ----
 lapply(
   
   names(d1),

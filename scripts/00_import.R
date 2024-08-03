@@ -28,6 +28,7 @@ dem <-
     "Valid" = "Was_the_examination_valid?"
   ) %>%
   mutate(
+    ID = gsub(" ", "", ID), # no spaces in ID allowed
     PA = factor(
       PA,
       levels = 1:6,
@@ -58,6 +59,7 @@ dem <-
 cog <-
   read.xlsx( dfile, sheet = "3COGNITIVE_TESTS" ) %>%
   mutate(
+    ID = gsub(" ", "", ID), # no spaces in ID allowed,
     SA = factor(
       `SA_New-BNT-TMT`,
       levels = 1:2,
@@ -75,18 +77,13 @@ cog <-
       )
     )
   ) %>%
-  select(ID, SA, WHO_PA, `RAVLT_1-5`, RAVLT_delayed_recall, TMT_A_time, TMT_B_time, Spon_sem, VF_animals) %>%
-  filter(ID %in% dem$ID)
-
-# Cobra-A
-cobra <-
-  read.xlsx( dfile, sheet = "6COBRA-B-PA" ) %>%
-  select( -contains("PA") )
+  select(ID, SA, WHO_PA, `RAVLT_1-5`, RAVLT_delayed_recall, TMT_A_time, TMT_B_time, Spon_sem, VF_animals)
 
 # activities
 act <-
   read.xlsx( dfile, sheet = "5RETROS-LEISURE_ACTIVITIES" ) %>%
   mutate(
+    ID = gsub(".0", "", gsub(" ", "", ID), fixed = T), # no spaces or decimals in ID allowed
     Activity = if_else(Activity == "theathre", "theatre", Activity),
     Activity_type = case_when(
       Activity == "reading" ~ "mental",
@@ -108,8 +105,7 @@ act <-
       )
     ),
     Category = unlist( sapply( 1:nrow(.), function(i) map[map$activity == Activity[i], "category"] ), use.names = F )
-  ) %>%
-  filter(ID %in% dem$ID)
+  )
 
 # save the outcomes as .rds
-saveRDS( list(dem = dem, cog = cog, act = act, cobra = cobra, map = map), file = here("_data.rds") )
+saveRDS( list(dem = dem, cog = cog, act = act, map = map), file = here("_data.rds") )
