@@ -2,8 +2,174 @@
 title: "Leisure activities in sporty old ladies"
 author: "Josef Mana"
 date: "`r Sys.Date()`"
-format: pdf
 warning: false
 echo: false
+title-block-banner: true
+format:
+  pdf: 
+    self-contained: true
+    code-fold: true
+    toc: true
+    toc-depth: 3
+    df-print: default
 ---
 
+```{r}
+#| label: envir
+
+library(here)
+library(tidyverse)
+library(gt)
+
+source( here("scripts","utils.R") ) # in-house functions
+
+```
+
+# Data set
+
+```{r}
+#| label: desc
+
+for ( i in names( readRDS( here("_data.rds") ) ) ) assign( i, readRDS( here("_data.rds") )[[i]] ) # data
+d <- left_join(cog, dem, by = "ID")
+
+N <- as.matrix( table(d$SA) ) # number of SA/nonSA ladies
+
+# extract age, education info
+desc <-
+  d %>%
+  group_by(SA) %>%
+  summarise( across( all_of( c("Age_years","Education_years") ), msd ) ) %>%
+  column_to_rownames("SA")
+
+
+```
+
+This report is based on total of `r N["SA", ]` ladies categorised as cognitive SuperAgers (SA, `r desc["SA", "Age_years"]` years old, `r desc["SA", "Education_years"]` years of education), and `r N["nonSA", ]` ladies categorised not as such (nonSA, `r desc["nonSA", "Age_years"]` years old, `r desc["nonSA", "Education_years"]` years of education).
+
+In the report, I first present counts of activities each participant recalled and compare them across activity type (mental vs physical), superaging status (SA vs nonSA), and seasoness (seasonal vs non-seasonal). These are summarised in a set of contingency table and compared via t-tests, Mann-Whitney U tests, and Chi-square tests. Next, I analysed the intensity/frequency rating of reported activities across lifespan (time bins) and compared their trajectories across activity type, superaging status, and seasoness as well. This was done via a set of Bayesian generalised linear mixed models (GLMMs). Since there were no seasonal mental activities, I analysed non-seasonal only activities for activity type differences and physical activities only for seasoness differences.
+
+# Counts
+
+For the purposes of this report, I refer to number of activities as their counts. An activity is counted if a participant reported it at least once without considering activity's reported frequency/intensity. In principle, we can count either number of activities per each participant or number of participants who reported each activity. I first describe the data from the former vantage point then from the latter.
+
+## Number of participants per activity
+
+@tbl-subj-desc shows number of participants reporting at least one of the type of activity listed in the "Category" column. The frequencies are very similar and none of the $\chi^2$ tests ended up with p < .05.
+
+```{r}
+#| label: tbl-subj-desc
+#| tbl-cap: Number and percentage of participants reporting each activity type per SA and nonSA group
+
+read.csv( here("tables","all_activity_categories_reports.csv") ) %>% gt()
+```
+
+## Number of activities per participant
+
+@tbl-act-desc, @tbl-act-ttest, and @tbl-act-wilcox show description (mean ± SD), test of zero difference in means (via two-tailed t-test with Welch modification to degrees of freedom) between SA and nonSA, and test of stochastical uniformity (Mann-Whitney U test) across SA and nonSA respectively. Across tables, each row is a combination of activity type, category and seasoness. Both, @tbl-act-ttest and @tbl-act-wilcox include effect size (Cohen's d and Vargha and Delaney's A - see e.g. [this blog post](https://rcompanion.org/handbook/F_04.html) or [this article](https://doi.org/10.3102/10769986025002101) for interpretation of the latter), test statistic, and p-value. For description see also all figures in [this folder](https://github.com/josefmana/cosactiw-retro-activities/tree/821579d0e259aa300921afac6239fd4cc55ae286/figures) that ends with "_counts.jpg". Overall, I can see no reliable difference between SA and nonSA groups. The only one coming close is more "flexibility_health_exercise" in SA group, however, among so many tests, I am quite sceptical.
+
+{{< pagebreak >}}
+
+```{r}
+#| label: tbl-act-desc
+#| tbl-cap: Number and percentage of the number of activities reported by each participant in SA and nonSA group
+
+read.csv( here("tables","activities_counts.csv"), sep = ";" ) %>%
+  select(type, category, season, nonSA, SA) %>%
+  gt()
+
+```
+
+{{< pagebreak >}}
+
+```{r}
+#| label: tbl-act-ttest
+#| tbl-cap: Difference between means of the number of activities reported by each participant in SA and nonSA group
+
+read.csv( here("tables","activities_counts.csv"), sep = ";" ) %>%
+  mutate( cohens_d = sub(" .*", "", cohens_d) ) %>%
+  select(type, category, season, cohens_d, t_stat, df, p_ttest) %>%
+  rename("t" = "t_stat", "p" = "p_ttest") %>%
+  gt()
+
+```
+
+{{< pagebreak >}}
+
+```{r}
+#| label: tbl-act-wilcox
+#| tbl-cap: Difference between distributions of number of activities reported by each participant in SA and nonSA group
+
+read.csv( here("tables","activities_counts.csv"), sep = ";" ) %>%
+  select(type, category, season, VD.A, W, p_mannwhitney) %>%
+  rename("p" = "p_mannwhitney") %>%
+  gt()
+
+```
+
+{{< pagebreak >}}
+
+# Frequencies/Intensities
+
+For this one, I dropped "do not know" answers, took logarithm of the remaining frequency scores (i.e., the outcome was log(Intensity) where Intensity took form of integers 1-4), and modelled it via LMMs. I modelled logarithms following Jirka's idea that because the distance between answers is increasing geometrically. Consequently, the models are pretty good in getting means and SDs of the data set correct, but it misses other properties of the distribution (see below). As I said above, I fitted two types of models: (i) only non-seasonal activities to compare mental vs physical, and (ii) only physical activities to compare seasonal vs non-seasonal. Time bin was modelled as monotonic predictor (see (this)[https://doi.org/10.1111/bmsp.12195]) in interaction with SA and activity type (model (i)) or seasoness (model (ii)) because the monotonic specification worked well (better than simply linear time, log(time) or "reverse" time where I computed Time_bin - Age instead of raw Time_bin). The models were fitted in (brms package)[https://github.com/paul-buerkner/brms.git] with specification:
+
+```{r}
+#| label: equations
+
+c( "logIntensity ~ 1 + mo(Time) * SA * Activity + (1 + Time | ID) + (1 + Time | Category)",
+   "logIntensity ~ 1 + mo(Time) * SA * Seasonal + (1 + Time | ID) + (1 + Time | Category)" )
+
+```
+
+The `(1 + Time | ID)` and `(1 + Time | Category)` terms say, that we modelled participant- and activity category-specific effects as well, which is good :-)
+
+## Results
+
+Next, I describe how well does the model reproduce data (if it could not do it, the results following would not mean much), then show results for each model in turn.
+
+### Validity checks
+
+The boring part. Neither model was good in reproducing the shape of distribution (@fig-ppc-nonseasonal-dens and @fig-ppc-physical-dens). On the other hand, both models were able to reproduce data means (@fig-ppc-nonseasonal-mean and @fig-ppc-physical-mean) and SDs (@fig-ppc-nonseasonal-sd and @fig-ppc-physical-sd). You can see that in the mean and SDs posterior predictive graphs, most vertical lines fall within histograms, that's what we want. So when interpreting the results presented next, keep in mind that they are most likely valid for means (and inference), not so for distributions (and prediction).
+
+### Non-seasonal, physical vs mental activities
+
+The results are summarised in @fig-nonseasonal-cond-means (on log scale). Left and right panels show the same thing from different point of views. Left panel shows pretty clearly that self-reported intensity/frequency of physical non-seasonal leisure activities decreases with age while self-reported intensity/frequency of mental leisure activities increases with age. The right panel shows pretty clearly that this tendency is the same in SA and nonSA participants.
+
+Probabilistic statements regarding these results (i.e., the stats) are available in the [GitHub "tables/" folder](https://github.com/josefmana/cosactiw-retro-activities/tree/821579d0e259aa300921afac6239fd4cc55ae286/tables) in the `nonseasonal_pairwise_comparisons.csv` file.
+
+![](../figures/conditional_means_nonseasonal_log_scale.jpg){#fig-nonseasonal-cond-means}
+
+{{< pagebreak >}}
+
+### Physical, non-seasonal vs seasonal activities
+
+The results are summarised in @fig-physical-cond-means (on log scale). Left and right panels show the same thing from different point of views. Left panel shows that self-reported intensity/frequency of non-seasonal leisure activities decreases more slowly with age than does self-reported intensity/frequency of seasonal leisure activities. It can also be seen there, that the slope (i.e., speed) of decrease is somewhat different between SA and nonSA groups. Better seen in the right panel is the finding that whereas the self-reported intensity/frequency of non-seasonal physical activities is practically identical between SA and nonSA groups, the SA participants reported less frequency/intensity of seasonal physical leisure activities across ages.
+
+
+Probabilistic statements regarding these results (i.e., the stats again) are available in the [GitHub "tables/" folder](https://github.com/josefmana/cosactiw-retro-activities/tree/821579d0e259aa300921afac6239fd4cc55ae286/tables) in the `physical_pairwise_comparisons.csv` file.
+
+![](../figures/conditional_means_physical_log_scale.jpg){#fig-physical-cond-means}
+
+{{< pagebreak >}}
+
+![](../figures/ppc_density_nonseasonal_ordered_time.jpg){#fig-ppc-nonseasonal-dens}
+
+{{< pagebreak >}}
+
+![](../figures/ppc_stat_mean_nonseasonal_ordered_time.jpg){#fig-ppc-nonseasonal-mean}
+
+{{< pagebreak >}}
+
+![](../figures/ppc_stat_sd_nonseasonal_ordered_time.jpg){#fig-ppc-nonseasonal-sd}
+
+{{< pagebreak >}}
+
+![](../figures/ppc_density_physical_ordered_time.jpg){#fig-ppc-physical-dens}
+
+{{< pagebreak >}}
+
+![](../figures/ppc_stat_mean_physical_ordered_time.jpg){#fig-ppc-physical-mean}
+
+{{< pagebreak >}}
+
+![](../figures/ppc_stat_sd_physical_ordered_time.jpg){#fig-ppc-physical-sd}
