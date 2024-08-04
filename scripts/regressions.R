@@ -1,4 +1,4 @@
-# Use this script to describe retrospectively recalled activities with respect to cognitive SA
+# Use this script to describe retrospectively recalled activities with respect to cognitive SA via Bayesian regressions.
 
 rm( list = ls() ) # clear environment
 options( mc.cores = parallel::detectCores() ) # set-up multiple cores
@@ -7,8 +7,6 @@ library(here)
 library(tidyverse)
 library(brms)
 library(bayesplot)
-library(bayestestR)
-library(patchwork)
 
 theme_set( theme_bw(base_size = 12) )
 source( here("scripts","utils.R") ) # in-house functions
@@ -133,7 +131,7 @@ d3 <- act %>%
     contrasts(SA) <- -contr.sum(2)/2 # nonSA = -0.5, SA = 0.5
     contrasts(Seasonal) <- -contr.sum(2)/2 # non-seasonal = -0.5, seasonal = 0.5
     contrasts(Activity_type) <- -contr.sum(2)/2 # mental = -0.5, physical = 0.5
-  } ) 
+  } )
 
 
 ## MODEL FITTING ----
@@ -177,21 +175,6 @@ fit_n <- lapply(
     )
   
 )
-
-# posterior predictive check for conditional means
-for ( i in names(fit_n) ) {
-  
-  print(
-    pp_check(
-      object = c(na.omit( subset(d3, Seasonal == F) )$logIntensity),
-      yrep = posterior_predict( fit_n[[i]], newdata = na.omit( subset(d3, Seasonal == F) ) ),
-      fun = ppc_stat_grouped,
-      stat = "mean",
-      group = na.omit( subset(d3, Seasonal == F) )$SA_Type_Time
-    )
-  )
-  
-}
 
 
 ### ---- physical activities (seasonal vs non-seasonal) ----
@@ -237,340 +220,36 @@ for ( i in names(fit_n) ) {
 ## MODEL COMPARISONS ----
 
 # compare expected out-of-sample predictive performance approximated via PSIS-LOO
-with( fit_n, loo(linear_time, reverse_time, ordered_time) )
-with( fit_p, loo(linear_time, reverse_time, ordered_time) )
+loo <- list(
+  
+  nonseasonal = with( fit_n, loo(linear_time, reverse_time, ordered_time) ),
+  physical = with( fit_p, loo(linear_time, reverse_time, ordered_time) )
+  
+)
+
+# save results of loo comparisons
+write.table(
+  
+  x = lapply(
+    
+    names(loo),
+    function(i)
+      
+      loo[[i]]$diffs %>%
+      as.data.frame() %>%
+      mutate(type = i, .before = 1) %>%
+      rownames_to_column("model")
+    
+  ) %>%
+    
+    do.call( rbind.data.frame, . ),
+  
+  file = here("tables","loo_model_comparisons.csv"),
+  row.names = F,
+  quote = F,
+  sep = ","
+
+)
 
 # Selecting ordered time in both cases and will continue with them only.
-fit <- list(nonseasonal = fit_n$ordered_time, physical = fit_p$ordered_time)
-rm(fit_n, fit_p, form_n, form_p, prior, i) # remove the old model objects
-gc() # clean memory if possible
-
-## POSTERIOR PREDICTIVE CHECKS ----
-
-# density plots
-lapply(
-  
-  names(fit),
-  function(i) {
-    
-    # prepare parameters for plotting
-    if (i == "nonseasonal") {
-      
-      data <- na.omit( subset(d3, Seasonal == F) )
-      x <- "SA_Type_Time"
-      txt <- "activity type"
-      
-      color_scheme_set("viridisA")
-      
-    } else if (i == "physical") {
-      
-      data <- na.omit( subset(d3, Activity_type == "physical") )
-      x <- "SA_Season_Time"
-      txt <- "seasoness"
-      
-      color_scheme_set("blue")
-      
-    }
-    
-    ### ---- density overlay ----
-    
-    # plot it
-    ppc_plot(
-      fit = fit[[i]],
-      data = data,
-      y = "logIntensity",
-      x = x,
-      labs = list(
-        "Observed (thick lines) and predicted (thin lines) distributions of log(Intensity) of recalled leisure activities",
-        paste0("Cells represent different combinations of SA status, ",txt,", and time bin.")
-      ),
-      meth = "dens_overlay_grouped",
-      draws = sample(1:4e3, 1e2),
-      stat = NULL
-    )
-    
-    # save it
-    ggsave(
-      plot = last_plot(),
-      filename = here( "figures", paste0("ppc_density_",i,"_ordered_time.jpg") ),
-      dpi = 300,
-      width = 12.6,
-      height = 13.3
-    )
-    
-    ### ---- stat plots ----
-    
-    lapply(
-      
-      c("mean","sd"),
-      function(j) {
-        
-        # plot it
-        ppc_plot(
-          fit = fit[[i]],
-          data = data,
-          y = "logIntensity",
-          x = x,
-          labs = list(
-            paste0("Observed (thick bars) and predicted (histograms) ",j," of log(Intensity) of recalled leisure activities"),
-            paste0("Cells represent different combinations of SA status, ",txt,", and time bin.")
-          ),
-          meth = "stat_grouped",
-          draws = 1:4e3,
-          stat = j
-        )
-        
-        # save it
-        ggsave(
-          plot = last_plot(),
-          filename = here( "figures", paste0("ppc_stat_",j,"_",i,"_ordered_time.jpg") ),
-          dpi = 300,
-          width = 12.6,
-          height = 13.3
-        )
-        
-      }
-    )
-    
-  }
-)
-
-
-## POST-PROCESSING ----
-
-# prepare a data frame for posterior inference
-# will be used for both nonseasonal and physical only models
-d_seq <- with(
-
-  d3,
-  expand.grid(
-    ID = NA,
-    Category = NA,
-    Activity_type = c( levels(Activity_type), NA ),
-    Seasonal = c( levels(Seasonal), NA ),
-    SA = c( levels(SA), NA ),
-    Time_bin = levels(Time_bin)
-
-  )
-) %>%
-  
-  mutate( Time_bin = as.ordered(Time_bin) ) %>%
-  within( . , {
-    contrasts(SA) <- -contr.sum(2)/2
-    contrasts(Seasonal) <- -contr.sum(2)/2
-    contrasts(Activity_type) <- -contr.sum(2)/2
-  } )
-
-# extract posterior draws for each combination of variables in each model
-ppred <- lapply(
-  
-  setNames( names(fit), names(fit) ),
-  function(i) {
-    
-    # prepare new data and column names for posterior E(X)s
-    if (i == "nonseasonal") {
-      
-      ndat <- subset(d_seq, Seasonal == F)
-      cnms <- with(ndat, paste(SA, Activity_type, Time_bin, sep = "_") )
-      
-    } else if (i == "physical") {
-      
-      ndat <- subset(d_seq, Activity_type == "physical")
-      cnms <- with(ndat, paste(SA, Seasonal, Time_bin, sep = "_") )
-      
-    }
-    
-    # compute it
-    # re_formula NA to ignore participant-level terms
-    return( posterior_epred(object = fit[[i]], newdata = ndat, re_formula = NA) %>% `colnames<-`(cnms) )
-
-  }
-)
-
-# add median and 95% PPIs for each prediction to the d_seq
-post_sum <- lapply(
-  
-  setNames( names(ppred), names(ppred) ),
-  function(i) {
-    
-    # prepare new data and column names for posterior E(X)s
-    if (i == "nonseasonal") d <- subset(d_seq, Seasonal == F) else if (i == "physical") d <- subset(d_seq, Activity_type == "physical")
-    
-    # add summaries
-    cbind(
-
-      d,
-      apply(
-        ppred[[i]],
-        2,
-        function(x)
-          c( logxEstimate = median(x),
-             logxETI_low = quantile(x, prob = .025, names = F),
-             logxETI_high = quantile(x, prob = .975, names = F),
-             rawxEstimate = median( exp(x) ),
-             rawxETI_low = quantile( exp(x), prob = .025, names = F),
-             rawxETI_high = quantile( exp(x), prob = .975, names = F)
-            )
-      ) %>%
-        t()
-
-    ) %>%
-      
-      as.data.frame() %>%
-      pivot_longer(
-        cols = starts_with("log") | starts_with("raw"),
-        names_to = c("scale","term"),
-        names_pattern = "(.*)x(.*)",
-        values_to = "value"
-      ) %>%
-      pivot_wider(
-        names_from = "term",
-        values_from = "value",
-        id_cols = c("Activity_type","Seasonal","SA","Time_bin","scale")
-      )
-  }
-)
-
-
-### ---- interaction plots ----
-
-#### ---- nonseasonal model ----
-
-# prepare
-fig_nonseasonal <- lapply(
-  
-  setNames( c("log","raw"), c("log","raw") ),
-  function(i) {
-    
-    # prepare data
-    data <-
-      post_sum$nonseasonal %>%
-      filter( !is.na(Activity_type) ) %>%
-      filter( !is.na(SA) ) %>%
-      filter( scale == i )
-    
-    # plot both ways
-    list(
-      
-      data %>%
-        ggplot() +
-        aes(x = Time_bin, y = Estimate, ymin = ETI_low, ymax = ETI_high, colour = Activity_type, group = Activity_type) +
-        geom_point( position = position_dodge(width = .5), size = 4 ) +
-        geom_linerange( position = position_dodge(width = .5), size = 1.5 ) +
-        geom_line(linetype = "dashed", linewidth = .8) +
-        scale_colour_manual( values = c("#56B4E9","#E69F00") ) +
-        facet_wrap( ~ SA, nrow = 2 ) +
-        theme(panel.grid = element_blank(), legend.position = "bottom"),
-      
-      data %>%
-        ggplot() +
-        aes(x = Time_bin, y = Estimate, ymin = ETI_low, ymax = ETI_high, colour = SA, group = SA) +
-        geom_point( position = position_dodge(width = .5), size = 4 ) +
-        geom_linerange( position = position_dodge(width = .5), size = 1.5 ) +
-        geom_line(linetype = "dashed", linewidth = .8) +
-        scale_colour_manual( values = c("#CC79A7","#999999") ) +
-        facet_wrap( ~ Activity_type, nrow = 2 ) +
-        theme(panel.grid = element_blank(), legend.position = "bottom")
-      
-    )
-    
-  }
-)
-
-# plot and save
-lapply(
-  
-  names(fig_nonseasonal),
-  function(i) {
-    
-    # plot it
-    with( fig_nonseasonal, get(i)[[1]] | get(i)[[2]] ) +
-      plot_layout(axis_titles = "collect") +
-      plot_annotation(
-        title = "Three-way interaction between time bin, SA, and activity type",
-        subtitle = paste0("Left and right sets of panels are representation of the same interaction on a ",i," scale"),
-        theme = theme( plot.title = element_text(hjust = .5, face = "bold"), plot.subtitle = element_text(hjust = .5) )
-      )
-    
-    # save it
-    ggsave(
-      plot = last_plot(),
-      filename = here( "figures", paste0("conditional_means_nonseasonal_",i,"_scale.jpg") ),
-      dpi = 300,
-      width = 12.6,
-      height = 8.31
-    )
-    
-  }
-)
-
-#### ---- physical model ----
-
-# prepare it
-fig_physical <- lapply(
-  
-  setNames( c("log","raw"), c("log","raw") ),
-  function(i) {
-    
-    # prepare data
-    data <-
-      post_sum$physical %>%
-      filter( !is.na(Seasonal) ) %>%
-      filter( !is.na(SA) ) %>%
-      filter( scale == i )
-    
-    # plot both ways
-    list(
-      
-      data %>%
-        ggplot() +
-        aes(x = Time_bin, y = Estimate, ymin = ETI_low, ymax = ETI_high, colour = Seasonal, group = Seasonal) +
-        geom_point( position = position_dodge(width = .5), size = 4 ) +
-        geom_linerange( position = position_dodge(width = .5), size = 1.5 ) +
-        geom_line(linetype = "dashed", linewidth = .8) +
-        scale_colour_manual( values = c("#F0E442","#009E73") ) +
-        facet_wrap( ~ SA, nrow = 2 ) +
-        theme(panel.grid = element_blank(), legend.position = "bottom"),
-      
-      data %>%
-        ggplot() +
-        aes(x = Time_bin, y = Estimate, ymin = ETI_low, ymax = ETI_high, colour = SA, group = SA) +
-        geom_point( position = position_dodge(width = .5), size = 4 ) +
-        geom_linerange( position = position_dodge(width = .5), size = 1.5 ) +
-        geom_line(linetype = "dashed", linewidth = .8) +
-        scale_colour_manual( values = c("#CC79A7","#999999") ) +
-        facet_wrap( ~ Seasonal, nrow = 2 ) +
-        theme(panel.grid = element_blank(), legend.position = "bottom")
-      
-    )
-    
-  }
-)
-
-# plot and save it
-lapply(
-  
-  names(fig_physical),
-  function(i) {
-    
-    # plot it
-    with( fig_physical, get(i)[[1]] | get(i)[[2]] ) +
-      plot_layout(axis_titles = "collect") +
-      plot_annotation(
-        title = "Three-way interaction between time bin, SA, and seasoness",
-        subtitle = paste0("Left and right sets of panels are representation of the same interaction on a ",i," scale"),
-        theme = theme( plot.title = element_text(hjust = .5, face = "bold"), plot.subtitle = element_text(hjust = .5) )
-      )
-    
-    # save it
-    ggsave(
-      plot = last_plot(),
-      filename = here( "figures", paste0("conditional_means_physical_",i,"_scale.jpg") ),
-      dpi = 300,
-      width = 12.6,
-      height = 8.31
-    )
-    
-  }
-)
 
