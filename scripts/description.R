@@ -1,4 +1,4 @@
-# Use this script to describe retrospectively remembered activities with respect to cognitive SA
+# Use this script to describe retrospectively remembered leisure activities with respect to cognitive SA
 
 rm( list = ls() ) # clear environment
 
@@ -129,7 +129,7 @@ tab1 <- sapply(
     t <- t.test( as.formula( paste0(v," ~ SA") ), data = d1[[s]] )
     d <- cohen.d( as.formula( paste0(v," ~ SA") ), data = d1[[s]] )
     
-    # calculate Mann-Whiteny test
+    # calculate Mann-Whitney test
     wilcox <- wilcox.test( as.formula( paste0(v," ~ SA") ), data = d1[[s]] )
     vda <- VD.A( as.formula( paste0(v," ~ SA") ), data = d1[[s]] )
     

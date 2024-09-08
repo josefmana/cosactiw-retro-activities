@@ -1,4 +1,4 @@
-# Use this script to describe retrospectively recalled activities with respect to cognitive SA via Bayesian regressions.
+# Use this script to describe retrospectively recalled leisure activities with respect to cognitive SA via Bayesian regressions.
 
 rm( list = ls() ) # clear environment
 options( mc.cores = parallel::detectCores() ) # set-up multiple cores

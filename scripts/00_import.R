@@ -11,14 +11,14 @@ dfile <- here("_raw","COSACTIW_NANOK_pro-jamovi.xlsx") # file with data
 
 # activities mapping
 map <-
-  read.xlsx( mfile, sheet = "Sheet 1" ) %>%
+  read.xlsx(mfile, sheet = "Sheet 1") %>%
   select(type, category, activity) %>%
   add_row(type = "physical", category = "flexibility_health_exercise", activity = "chi_kung") %>%
   arrange(type, category, activity)
 
 # demography
 dem <-
-  read.xlsx( dfile, sheet = "1ID_DATE_AGE_SCREENING_Demogr" ) %>%
+  read.xlsx(dfile, sheet = "1ID_DATE_AGE_SCREENING_Demogr") %>%
   #filter( `Was_the_examination_valid?` == 1 ) %>%
   rename(
     "Age_years" = "Age",
@@ -107,5 +107,25 @@ act <-
     Category = unlist( sapply( 1:nrow(.), function(i) map[map$activity == Activity[i], "category"] ), use.names = F )
   )
 
+# Cobra-A
+cobra <-
+  read.xlsx(dfile, sheet = "COSACTIW-pro-JAMOVI") %>%
+  select(1, `Total-mental-activities`, `total-MA-frequency`, `Total-MA-time`) %>%
+  rename(
+    "cobra_a_total" = "Total-mental-activities",
+    "cobra_a_frequency" = "total-MA-frequency",
+    "cobra_a_time" = "Total-MA-time"
+  )
+
+# VLS-AQL
+vls <-
+  read.xlsx(dfile, sheet = "COSACTIW-pro-JAMOVI") %>%
+  select( 1, starts_with("VLS_I") ) %>%
+  pivot_longer(
+    cols = -ID,
+    names_to = "item",
+    values_to = "response"
+  )
+
 # save the outcomes as .rds
-saveRDS( list(dem = dem, cog = cog, act = act, map = map), file = here("_data.rds") )
+saveRDS( list(dem = dem, cog = cog, act = act, cobra = cobra, vls = vls, map = map), file = here("_data.rds") )
