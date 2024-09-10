@@ -1,0 +1,214 @@
+---
+title: "Leisure Activities - Meths & Stats"
+shorttitle: "meths & stats"
+author:
+  - name: Melissa Schneiderová
+    corresponding: true
+    affiliations:
+      - name: PVSPS
+        department: OVV
+        city: Prague
+  - name: Josef Mana
+    corresponding: false
+    affiliations:
+      - name: PVSPS
+        department: OVV
+        city: Prague
+  - name: Hana Georgi
+    corresponding: true
+    affiliations:
+      - name: PVSPS
+        department: OVV
+        city: Prague
+abstract: ""
+keywords: [cool Bayes stats]
+author-note:
+  disclosures:
+    conflict of interest: The authors has no conflict of interest to declare.
+format:
+  apaquarto-pdf: default
+bibliography: references.bib
+echo: false
+warning: false
+---
+
+```{r}
+#| label: envir
+
+library(here)
+library(tidyverse)
+library(gt)
+library(rstan)
+
+source( here("scripts","utils.R") ) # in-house functions
+
+```
+
+# Methods
+
+## Statistical analyses
+
+### VLS-ALQ
+
+The dimensionality of the VLS-ALQ questionnaire scale in our sample was first checked via the confirmatory factor analysis (CFA) as implemented in the *lavaan* R package [@lavaan; @rsoft]. A three-factor model with separate 'Private,' 'Public,' and 'Religious' independent dimensions, a second order factor model with separate 'Private,' 'Public,' and 'Religious' and a superordinate 'Social' factor, and separate unidimensional models for the 'Private' and the 'Public' subscales. Models were evaluated by Tucker Lewis Index (TLI), Comparative Fit Index (CFI) and root-mean-square-error-aproximation (RMSEA) with values of TLI > .9, CFI > .9, and RMSEA < .08 considered indicating adequate fit. Next, internal consistency of the full questionnaire and the 'Public' and the 'Private' subscales were estimated via the Cronbach's $\alpha$ and Guttman's Lambda 6 (G6). Internal consistency indexes were estimated in the *psych* R package using the default settings [@psych; @rsoft]. Following the classical recommendations for interpretation of coefficient $\alpha$ [@streiner2003; @nunnally1994], we consider values above 0.7 as sufficient for early research, values above 0.8 as sufficient for basic research, and values above 0.9 as necessary for clinical use.
+
+Sum scores of the full VLS-ALQ questionnaire as well as its 'Private' and 'Public' subscales were described by their in-sample means $\pm$ standard deviations for SA and non-SA groups separately. The null hypothesis that SA and non-SA groups' means are equal was tested via the independent sample *t*-test with Welch modification to the degrees of freedom and effect size of mean differences characterised by Cohen's d. The null hypothesis that regarding test scores in SA and non-SA groups, neither distribution is stochastically greater than the other, was tested via the Mann-Whitney U test with effect size characterised by Vargha and Delaney A as implemented in the *effsize* R package [@effsize; @vargha2000]. Decision threshold for claiming statistically significant deviance from a null hypothesis in these comparisons was set at p < .05.
+
+### COBRA-A
+
+*To be added, by someone else hopefully :-)*
+
+### Leisure activities
+
+The self-reported leisure activities' distributions were described in three ways: (i) as counts of activity type per participant, and (ii) as a number of participants reporting at least one activity of each activity type, and (iii) as a time-series of expected means of self-reported intensity ratings.
+
+The counts of activity type were then described separately for SA and non-SA groups stratified by modality (physical, mental, both) and seasoness (seasonal, non-seasonal) by their in-sample means $\pm$ standard deviations. Null hypotheses of equal means and stochastical equality of SA versus non-SA count distributions were tested via *t*-test with Welch modification to the degrees of freedom and the Mann-Whitney U test respectively. Effect sizes of differences between SA and non-SA means or distributions were described by Cohen's d and Vargha and Delaney A as implemented in the *effsize* R package [@effsize; @vargha2000]. Decision threshold for claiming statistically significant deviance from a null hypothesis in these comparisons was set at p < .05.^[***Note from Pepa, not to be included in the final text. I used the 'vanilla approach' of testing nulls about mean differences and stochastical equality, however, the very viable alternative would be a set of GLMs (regressions) with Poisson or Negative Binomial likelihood which are good candidates for modelling count variables. The choice between methods depends on the type of answer we are looking for (i.e., the estimand). Do we want just compare distributions of these counts with not many assumptions? Then the vanilla approach might work well. Or do we want a way to compare distributions and derive sensible predictions? Then the 'regression approach' would be better. Do we want causal instead of descriptive estimates? Then we need to put more work into the pre-statistic scientific model building. Pick your poison I guess :-D***]
+
+The number of participants reporting at least one activity belonging to a given activity type was described by contingency tables separately for each modality (physical, mental, both), seasoness (seasonal, non-seasonal), and SA status (SA, non-SA). Within each modality and seasoness combination, the Pearson's $\chi^2$ test of the null hypothesis that SA status and activity type are independent of each other was performed. The strength of association between SA status and activity type was described by Cramérs' V. Decision threshold for claiming statistically significant deviance from a null hypothesis in these comparisons was set at p < .05.
+
+The expected means of self-reported intensities of single leisure activities across lifetime was modelled via a set of Bayesian Generalised Linear Mixed Models (GLMMs) with monotonic effect of time [@bürkner2017b; @bürkner2020]. The models specified below and in the Appendix were fitted to data and used to generate posterior draws of the expected value of the intensity conditional on different combinations of life decade, SA status, seasoness and modality as predictors of interest. These posterior draws were then described by their medians and 95% equal tailed posterior intervals (ETIs).
+
+Since there was no mental activity that would also be seasonal, two GLMMs were fitted. In the first model, the self-reported intensity of non-seasonal activities was regressed on the life decade (monotonic ordered predictor), SA status, modality, and their two- and three-way interactions on group-level as well as correlated participant-level and activity-level intercept and slopes across decades. This model was used to estimate expectations of intensity ratings conditional on decade of life, SA status and activity modality. In the second model, the self-reported intensity of physical activities was regressed on the life decade (monotonic ordered predictor), SA status, seasoness, and their two- and three-way interactions on group-level as well as correlated participant-level and activity-level intercept and slopes across decades. This model was used to estimate expectations of intensity ratings conditional on decade of life, SA status and seasoness of physical activities. See the Appendix for full model specifications.
+
+All GLMMs were fitted using Stan’s (version `r stan_version()`) build-in Hamiltonian Monte Carlo sampler accessed via R version `r with( version, paste(major,minor,sep=".") )` using package “brms” [@bürkner2017; @rsoft; @stan]. Four parallel chains were run each for 2,000 iterations for each GLMM. The first 1,000 iterations served as a warm-up and were discarded. Convergence was checked numerically by inspection of the $\hat{R}s$ and visually by inspection of trace plots. Posterior predictive checks for each combination of predictors was used to ensure the models reliably reproduce in-sample means. This study’s design and its analysis were not pre-registered. The data are not publicly available due to privacy or ethical restrictions. The computer code used in the data analysis can be accessed at [https://github.com/josefmana/cosactiw-retro-activities.git](https://github.com/josefmana/cosactiw-retro-activities.git).
+
+# Results
+
+```{r}
+#| label: data-read
+
+for ( i in names( readRDS( here("_data.rds") ) ) ) assign( i, readRDS( here("_data.rds") )[[i]] ) # data
+d <- left_join(cog, dem, by = "ID")
+
+N <- as.matrix( table(d$SA) ) # number of SA/nonSA ladies
+
+# extract age, education info
+demo <-
+  
+  # extract means ± SDs
+  d %>%
+  group_by(SA) %>%
+  summarise( across( all_of( c("Age_years","Education_years") ), msd ) ) %>%
+  column_to_rownames("SA") %>%
+  t() %>%
+  as.data.frame() %>%
+  
+  # add t-test results
+  mutate(
+    t = rprint(unlist(sapply( rownames(.), function(y) t.test( as.formula( paste0(y," ~ SA") ), data = d )$statistic ), use.names = F) , d = 3),
+    df = rprint(unlist(sapply( rownames(.), function(y) t.test( as.formula( paste0(y," ~ SA") ), data = d )$parameter ), use.names = F) , d = 2),
+    p = zerolead(unlist(sapply( rownames(.), function(y) t.test( as.formula( paste0(y," ~ SA") ), data = d )$p.value ), use.names = F) , d = 3),
+  )
+
+```
+
+Overall, there was a total of `r N['SA', ]` women categorised as SA(`r demo['Age_years', 'SA']` years old, `r demo['Education_years', 'SA']` years of education), and `r N['nonSA', ]` women categorised as non-SA (`r demo['Age_years', 'nonSA']` years old, `r demo['Education_years', 'nonSA']` years of education). The null hypothesis of equal means was not rejected for neither age (t(`r demo['Age_years', 'df']`) = `r demo['Age_years', 't']`, p = `r demo['Age_years', 'p']`) nor education (t(`r demo['Education_years', 'df']`) = `r demo['Education_years', 't']`, p = `r demo['Education_years', 'p']`).
+
+## VLS-ALQ
+
+```{r}
+#| label: vls-icon
+
+# prepare a table with internal consistency measures
+icon <-
+  read.csv( here("tables","vls_reliabilities.csv"), sep = "," ) %>%
+  select(Scale, std.alpha, G6.smc.) %>%
+  filter( !is.na(std.alpha) ) %>%
+  column_to_rownames("Scale") %>%
+  mutate_all(rprint, 3)
+
+```
+
+The 'total' VLS-ALQ scale ($\alpha$ = `r icon['Total','std.alpha']`, G6 = `r icon['Total','G6.smc.']`), as well as the 'private' subscale ($\alpha$ = `r icon['Private','std.alpha']`, G6 = `r icon['Private','G6.smc.']`) and the 'public' subscale ($\alpha$ = `r icon['Public','std.alpha']`, G6 = `r icon['Public','G6.smc.']`) showed low levels of internal consistency an inadequate fit of CFAs to data in the current sample (see @tbl-vls-reli). Consequently, the following results ought to be interpreted with the low internal consistency in mind as this could severely lower statistical power. The statistical comparisons of means and distributions of VLS-ALQ scores in non-SA versus SA participants is presented in @tbl-vls-comps. No null hypothesis was rejected based on our data.
+
+```{r}
+#| label: tbl-vls-comps
+#| tbl-cap: Description and statistical comparison of VLS-ALQ scale scores
+
+read.csv(here("tables","vls_sum_scores.csv"), sep = ";") %>%
+  
+  # keep only scales
+  filter( Scale %in% paste0( "VLS_", c("total", "private", "public", "I_attend_church_services") ) ) %>%
+  rename("SA" = "X1", "non-SA" = "X0") %>%
+  mutate(
+    Scale = case_when(
+      Scale == "VLS_total" ~ "Total",
+      Scale == "VLS_private" ~ "Private",
+      Scale == "VLS_public" ~ "Public",
+      Scale == "VLS_I_attend_church_services" ~ "Religious"
+    )
+  ) %>%
+  
+  # format it
+  gt() %>%
+  
+  # group columns together
+  tab_spanner(columns = ends_with("SA"), label = "Descriptive statistics", gather = F) %>%
+  tab_spanner(columns = all_of( c("cohens_d","t_stat","df","p_ttest") ), label = "t-test", gather = F) %>%
+  tab_spanner(columns = all_of( c("VD.A","W","p_mannwhitney") ), label = "Mann Whitney U test", gather = F) %>%
+  tab_spanner(columns = !any_of( c("Scale","non-SA","SA") ), label = "Inferential statistics", gather = F) %>%
+  
+  # rename columns
+  cols_label(
+    cohens_d ~ "Cohen's d",
+    t_stat ~ "t",
+    starts_with("p_") ~ "p"
+  )
+  
+
+```
+
+## Leisure activities
+
+### Counts of activity types
+
+### Number of participants reporting an activity
+
+### Intensity ratings
+
+# Appendix
+
+```{r}
+#| label: tbl-vls-reli
+#| tbl-cap: Confirmatory factor analyses and internal consistency estimates of the VLS-ALQ scale
+
+read.csv(here("tables","vls_reliabilities.csv"), sep = ",") %>%
+
+  mutate(
+    across( all_of("npar"), ~ rprint(.x, 0) ),
+    across( starts_with("rmsea"), ~ rprint(.x, 3) ),
+    across( c( cfi.robust, tli.robust, ends_with("alpha"), "G6.smc.", "average_r" ), ~ rprint(.x, 2) )
+  ) %>%
+  
+  mutate( rmsea.ci = paste0("[",rmsea.ci.lower.robust,", ",rmsea.ci.upper.robust,"]"), .after = rmsea.robust ) %>%
+  select( -rmsea.ci.lower.robust, -rmsea.ci.upper.robust ) %>%
+  mutate( across( everything(), ~ ifelse(.x == "NA", "-", .x) ) ) %>%
+  relocate( starts_with("rmsea"), .after = npar ) %>%
+  
+  gt() %>%
+  fmt_number( decimals = 0 ) %>%
+  cols_align( align = "center", columns = -1 ) %>%
+  
+  tab_spanner( label = "RMSEA", columns = c( starts_with("rmsea") ), gather = F ) %>%
+  tab_spanner( label = html("Cronbach's alpha"), columns = c( ends_with("alpha") ), gather = F ) %>%
+  tab_spanner( label = "Confirmatory factor analysis", columns = c(npar,ends_with("robust"), starts_with("rmsea") ), gather = F ) %>%
+  tab_spanner( label = "Internal consistency", columns = c(ends_with("alpha"), G6.smc., average_r), gather = F ) %>%
+          
+  cols_label(
+    n ~ "N",
+    npar ~ "K",
+    cfi.robust ~ "CFI",
+    tli.robust ~ "TLI",
+    rmsea.robust ~ "estimate",
+    rmsea.ci ~ "90% CI",
+    raw_alpha ~ "raw",
+    std.alpha ~ "stand.",
+    G6.smc. ~ "G6",
+    average_r ~ "r"
+  ) %>%
+  
+  tab_source_note(
+    source_note = "N: number of participants; K: number of parameters of the confirmatory factor analysis model; RMSEA: root-mean-square error approximation; CI: confidence interval; CFI: comparative fit index, TLI: Tucker-Lewis Index; raw: Cronbach's alpha; based upon the covariances; stand.: Cronbach's alpha; based upon the correlations, G6: Guttman's lambda; 6 reliability; r: the average inter-item correlation; for RMSEA, values less than 0.08 indicating an adequate model fit (especially values of upper 90% CI bound lower than 0.08), for CFI and TLI, values exceeding 0.90 are considered to indicate a good model fit."
+  )
+
+```
