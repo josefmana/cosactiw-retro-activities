@@ -166,9 +166,9 @@ d_seq <- with(
   expand.grid(
     ID = NA,
     Category = NA,
-    Activity_type = c( levels(Activity_type), NA ),
-    Seasonal = c( levels(Seasonal), NA ),
-    SA = c( levels(SA), NA ),
+    Activity_type = c(levels(Activity_type), NA),
+    Seasonal = c(levels(Seasonal), NA),
+    SA = c(levels(SA), NA),
     Time_bin = levels(Time_bin)
     
   )
@@ -259,7 +259,7 @@ lapply(
     
     write.table(
       x = post_sum[[i]],
-      file = here( "tables", paste0(i,"_conditional_means.csv") ),
+      file = here( "tables", paste0("la_",i,"_conditional_means.csv") ),
       sep = ",",
       row.names = F,
       quote = F
@@ -635,7 +635,7 @@ write.table(
     pivot_wider( names_from = scale, values_from = c(Estimate, pd) ) %>%
     relocate(pd_log, .after = Estimate_log),
   
-  file = here("tables","nonseasonal_pairwise_comparisons.csv"),
+  file = here("tables","la_nonseasonal_pairwise_comparisons.csv"),
   row.names = F,
   quote = F,
   sep = ";"
@@ -754,7 +754,7 @@ write.table(
     pivot_wider( names_from = scale, values_from = c(Estimate, pd) ) %>%
     relocate(pd_log, .after = Estimate_log),
   
-  file = here("tables","physical_pairwise_comparisons.csv"),
+  file = here("tables","la_physical_pairwise_comparisons.csv"),
   row.names = F,
   quote = F,
   sep = ";"

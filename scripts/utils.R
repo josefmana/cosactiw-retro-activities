@@ -13,6 +13,15 @@ zerolead <- function(x, d = 3) ifelse( x < .001, "< .001", sub("0.", ".", rprint
 # calculate and return mean ± SD ignoring NAs
 msd <- function(x, d = 2) paste0( rprint( mean(x, na.rm = T), d ), " ± ", rprint( sd(x, na.rm = T), d ) )
 
+# upper bound
+ubound <- function(x, dec = 2) ifelse( round(x,dec) > x, rprint(x,dec), rprint( x+1/(10^dec), dec ) )
+
+# capitalise the first letter
+capitalise <- function(x) {
+  substr(x, 1, 1) <- toupper(substr(x, 1, 1))
+  x
+}
+
 # plot posterior predictions
 ppc_plot <-
   

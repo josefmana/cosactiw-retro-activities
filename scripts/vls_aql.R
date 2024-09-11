@@ -159,7 +159,7 @@ write.table(
           
           # calculate t-test
           t <- t.test(as.formula( paste0(y," ~ SA") ), data = d1)
-          d <- cohen.d(as.formula( paste0(y," ~ SA") ), data = d1)
+          d <- effsize::cohen.d(as.formula( paste0(y," ~ SA") ), data = d1)
           
           # calculate Mann-Whiteny test
           wilcox <- wilcox.test(as.formula( paste0(y," ~ SA") ), data = d1)
@@ -167,7 +167,8 @@ write.table(
           
           # return it
           return( c(
-            cohens_d = paste0( rprint(d$estimate), " ", ciprint(d$conf.int) ),
+            #cohens_d = paste0( rprint(d$estimate), " ", ciprint(d$conf.int) ),
+            cohens_d = rprint(d$estimate),
             t_stat = rprint(t$statistic),
             df = rprint(t$parameter),
             p_ttest = zerolead(t$p.value),

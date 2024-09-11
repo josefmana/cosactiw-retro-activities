@@ -48,57 +48,10 @@ d1 <- sapply(
   left_join(dem, by = "ID")
 
 
-## COUNTS ----
-
-# prepare data for a GLMM
-d2 <- d1 %>%
-  select( ID, SA, all_of(map$category) ) %>%
-  pivot_longer(
-    cols = all_of(map$category),
-    values_to = "Count",
-    names_to = "Category"
-  ) %>%
-  mutate(
-    SA =
-      factor(
-        SA,
-        levels = c("nonSA","SA"),
-        ordered = T
-      ),
-    Type =
-      factor(
-        unlist(
-          sapply( 1:nrow(.), function(i) with( map, unique( type[category == Category[i]] ) ) ),
-          use.names = F
-        )
-      ),
-    .before = Category
-  ) %>%
-  within( . , {
-    contrasts(SA) <- -contr.sum(2)/2 # nonSA = -0.5, SA = 0.5
-    contrasts(Type) <- -contr.sum(2)/2 # mental = -0.5, physical = 0.5
-  } )
-
-# Poisson model
-#fit0poiss <- brm(
-#  formula = Count ~ 1 + SA * Type + (1 | ID) + (1 | Category),
-#  family = poisson(link = "log"),
-#  prior = c(
-#    prior("normal(-2.3,2.5)", class = "Intercept"),
-#    prior("normal(0,1)", class = "b"),
-#    prior("exponential(1)", class = "sd")
-#  ),
-#  data = d2,
-#  control = list(adapt_delta = .9),
-#  file = here("models","count_poisson.rds"),
-#  file_refit = "on_change"
-#)
-
-
 # FREQUENCIES ----
 
 # prepare data
-d3 <- act %>%
+d2 <- act %>%
   
   left_join( dem[ , c("ID","Age_years")] ) %>%
   filter( complete.cases(Intensity) ) %>%
@@ -169,7 +122,7 @@ fit_n <- lapply(
       formula = form_n[[i]],
       family = gaussian(link = "identity"),
       prior = prior,
-      data = subset(d3, Seasonal == F),
+      data = subset(d2, Seasonal == F),
       file = here( "models", paste0(i,"_nonseasonal.rds") ),
       file_refit = "on_change"
     )
@@ -199,7 +152,7 @@ fit_p <- lapply(
       formula = form_p[[i]],
       family = gaussian(link = "identity"),
       prior = prior,
-      data = subset(d3, Activity_type == "physical"),
+      data = subset(d2, Activity_type == "physical"),
       file = here( "models", paste0(i,"_physical.rds") ),
       file_refit = "on_change"
     )

@@ -5,6 +5,7 @@ rm( list = ls() ) # clear environment
 library(here)
 library(tidyverse)
 library(effsize)
+library(rcompanion)
 
 theme_set( theme_bw(base_size = 12) )
 sapply( c("figures","tables","models"), function(i) if( !dir.exists(i) ) dir.create(i) ) # prepare folders
@@ -123,7 +124,7 @@ tab1 <- sapply(
     
     # extract variables to be used
     s <- tab1$season[i]
-    v <- with( tab1, case_when( type[i] == "all" & category[i] == "all" ~ "activities", category[i] == "all" ~ type[i], .default = category[i]) )
+    v <- with( tab1, case_when( type[i] == "all" & category[i] == "all" ~ "activities", category[i] == "all" ~ type[i], .default = category[i] ) )
     
     # calculate t-test
     t <- t.test( as.formula( paste0(v," ~ SA") ), data = d1[[s]] )
@@ -135,7 +136,8 @@ tab1 <- sapply(
     
     # return it
     return( c(
-      cohens_d = paste0( rprint(d$estimate), " ", ciprint(d$conf.int) ),
+      #cohens_d = paste0( rprint(d$estimate), " ", ciprint(d$conf.int) ),
+      cohens_d = rprint(d$estimate),
       t_stat = rprint(t$statistic),
       df = rprint(t$parameter),
       p_ttest = zerolead(t$p.value),
@@ -150,13 +152,30 @@ tab1 <- sapply(
   t() %>%
   as.data.frame() %>%
   cbind.data.frame( tab1, . ) %>%
-  mutate( across( everything(), ~ case_when( grepl("NaN",.x) ~ "-", is.na(.x) ~ "-", .default = .x ) ) )
+  mutate(
+    
+    # get rid of NaNs
+    across( everything(), ~ case_when( grepl("NaN",.x) ~ "-", is.na(.x) ~ "-", .default = .x ) ),
+    
+    # renaming
+    category = if_else(category == "all", "-", category),
+    type = case_when(
+      type == "all" ~ "Both",
+      type == "mental" ~ "Mental",
+      type == "physical" ~ "Physical"
+    ),
+    season = case_when(
+      season == "all" & type == "mental" ~ "Non-seasonal",
+      season == "all" & type != "mental" ~ "Seasonal & Non-seasonal",
+      .default = capitalise(season)
+    )
+  )
 
 # save the table as .csv
-write.table(x = tab1, file = here("tables","activities_counts.csv"), sep = ";", row.names = F, quote = F)
+write.table(x = tab1, file = here("tables","la_activities_counts.csv"), sep = ";", row.names = F, quote = F)
 
 
-### tables of counts of participants reporting at least one activity in a category ----
+### tables of the number of participants reporting at least one activity in a category ----
 
 # for all of them, Chi-square based p > .05
 lapply(
@@ -176,13 +195,65 @@ lapply(
     mutate( across(ends_with("SA"), ~ paste0(.x, " (", rprint( 100 * .x/n[cur_column()], 0),"%)"), .names = "{col}_perc") ) %>%
     rownames_to_column("Category") %>%
     write.table(
-      file = here( "tables", paste0(x,"_activity_categories_reports.csv") ),
+      file = here( "tables", paste0("la_",x,"_participants_numbers.csv") ),
       sep = ",",
       row.names = F,
       quote = F
     )
   
 )
+
+# get the stats
+lapply(
+  
+  set_names( names(d1) ),
+  function(i)
+    
+    sapply(
+      
+      c("physical","mental"),
+      function(x) {
+        
+        if (i != "non-seasonal" & x == "mental") return( data.frame(season = i, type = x, chisq = NA, df = NA, p = NA, cramer_v = NA) )
+        else {
+          
+          # contingency table to be analysed
+          contab <-
+            read.csv( here( "tables", paste0("la_",i,"_participants_numbers.csv") ) ) %>%
+            mutate(sum = SA + nonSA) %>% # drop zero-sum rows
+            filter(Type == x & sum > 0) %>%
+            select( ends_with("SA") ) %>%
+            as.matrix() 
+          
+          # testing
+          chsq <- chisq.test(contab)
+          v <- cramerV(contab)
+          
+          # return table
+          return(
+            data.frame(
+              season = i,
+              type = x,
+              chisq = rprint(chsq$statistic, 3),
+              df = rprint(chsq$parameter, 0),
+              p = zerolead(chsq$p.value, 3),
+              cramer_v = rprint(v, 3)
+            )
+          )
+          
+        }
+      }
+    ) %>% t()
+) %>%
+  
+  do.call( rbind.data.frame, . ) %>%
+  mutate_all(unlist, use.names = F) %>%
+  write.table(
+    file = here("tables","la_participants_numbers_chisquared.csv"),
+    sep = ",",
+    row.names = F,
+    quote = F
+  )
 
 
 ## FIGURES ----
@@ -236,7 +307,7 @@ lapply(
     # save it
     ggsave(
       plot = last_plot(),
-      filename = here( "figures", paste0(x,"_activity_categories_counts.jpg") ),
+      filename = here( "figures", paste0("la_",x,"_activities_counts.jpg") ),
       dpi = 300,
       width = 12.6,
       height = 13.3
@@ -287,7 +358,7 @@ lapply(
     # save it
     ggsave(
       plot = last_plot(),
-      filename = here( "figures", paste0(x,"_activitiy_categories_reports.jpg") ),
+      filename = here( "figures", paste0("_la_",x,"_activities_reports.jpg") ),
       dpi = 300,
       width = 10,
       height = 10.6
@@ -343,7 +414,7 @@ lapply(
     # save it
     ggsave(
       plot = last_plot(),
-      filename = here( "figures", paste0("_",x,"_single_activities_reports.jpg") ),
+      filename = here( "figures", paste0("_la_",x,"_participant_numbers.jpg") ),
       dpi = 300,
       width = 10,
       height = 30.6

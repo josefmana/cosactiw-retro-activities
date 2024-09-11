@@ -1,0 +1,7 @@
+season,type,chisq,df,p,cramer_v
+all,physical,1.544,4,.819,0.052
+all,mental,NA,NA,NA,NA
+non-seasonal,physical,2.298,4,.681,0.067
+non-seasonal,mental,2.619,4,.624,0.081
+seasonal,physical,3.512,3,.319,0.143
+seasonal,mental,NA,NA,NA,NA
