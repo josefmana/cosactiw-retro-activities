@@ -27,6 +27,7 @@ author-note:
     conflict of interest: The authors has no conflict of interest to declare.
 format:
   apaquarto-pdf: default
+floatsintext: true
 bibliography: references.bib
 echo: false
 warning: false
@@ -67,7 +68,7 @@ The counts of activity type were described separately for SA and non-SA groups s
 
 The number of participants reporting at least one activity belonging to a given activity type was described by contingency tables separately for each modality (physical, mental, both), seasoness (seasonal, non-seasonal), and SA status (SA, non-SA). Within each modality/seasoness combination, the Pearson's $\chi^2$ test of the null hypothesis that SA status and activity type are independent of each other was performed. The strength of association between SA status and activity type was described by Cramérs' V as implemented in the "rcompanion" package [@rcompanion]. Decision threshold for claiming statistically significant deviance from a null hypothesis in these comparisons was set at p < .05.
 
-Finally, the expected means of self-reported intensities of single leisure activities across lifetime were modelled via a set of Bayesian Generalised Linear Mixed Models (GLMMs) with time (decade of life) as a monotonic predictor [@bürkner2017b; @bürkner2020]. The GLMMs (specified below) were fitted to data and used to generate posterior draws of the expected value of the activtiy intensity conditional on different combinations of life decade, SA status, seasoness and modality as predictors of interest. These posterior draws were then described by their medians and 95% equal tailed posterior intervals (ETIs). Moreover, pairwise comparisons between expected intensity conditional on decades of life, SA status, modality and seasoness were directly compared and evaluated by the probability of direction (*pd*) index of effect existence [@makowski2019].
+Finally, the expected means of self-reported intensities of single leisure activities across lifetime were modelled via a set of Bayesian Generalised Linear Mixed Models (GLMMs) with time (decade of life) as a monotonic predictor [@bürkner2017b; @bürkner2020]. The GLMMs (specified below) were fitted to data and used to generate posterior draws of the expected value of the activtiy intensity conditional on different combinations of life decade, SA status, seasoness and modality as predictors of interest. These posterior draws were then described by their medians and 95% equal tailed posterior intervals (ETIs). Moreover, pairwise comparisons between expected intensity conditional on decades of life, SA status, modality and seasoness were directly compared and evaluated by the probability of direction (*pd*) index of effect existence [@makowski2019]. All pairwise comparisons estimates are denoted $\delta_{x-y}$ throughout the article.
 
 Since there was no mental activity that would also be seasonal, two GLMMs were fitted. In the first model, the self-reported intensity of non-seasonal activities was regressed on the decade of life (monotonic ordered predictor), SA status, modality, and their two- and three-way interactions on group-level as well as correlated participant- and activity type-specific intercepts and slopes across decades. This model was used to estimate expectations of nonseasonal activities' intensity ratings conditional on a decade of life, SA status and activity modality. In the second model, the self-reported intensity of physical activities was regressed on the decade of life (monotonic ordered predictor), SA status, seasoness, and their two- and three-way interactions on group-level as well as correlated participant- and activity type-specigic intercepts and slopes across decades. This model was used to estimate expectations of intensity ratings conditional on decade of life, SA status and seasoness of physical activities.^[***Another message from Pepa. It would be best to add full model specification to Appendix. I will do so but it will take some time so I would wait until the article takes a more concete form on itself before I allocate time to Appendix activity.***]
 
@@ -250,13 +251,19 @@ fit <- list(
 # extract rhats
 rhatmax <- ubound( max( sapply(names(fit), function(i) max( rhat(fit[[i]]) ) ) ), 3)
 
+# extract comparisons
+comps_phys <- read.csv(here("tables","la_physical_pairwise_comparisons.csv"), sep = ";")
+comps_nsea <- read.csv(here("tables","la_nonseasonal_pairwise_comparisons.csv"), sep = ";")
+
 ```
 
-Both GLMMs converged in specified number of iterations to a stationary posterior distribution ($\hat{R}s \leq `r rhatmax`$). Both models showed adequate reproduction of sample means (@fig-ppc-nonseasonal-mean and @fig-ppc-physical-mean) and standard deviations (@fig-ppc-nonseasonal-sd and @fig-ppc-physical-sd) but not the shapes of sample distributions (@fig-ppc-nonseasonal-dens and @fig-ppc-physical-dens).
+Both GLMMs converged in the specified number of iterations to a stationary posterior distribution ($\hat{R}s \leq `r rhatmax`$). Both models showed adequate reproduction of sample means (@fig-ppc-nonseasonal-mean and @fig-ppc-physical-mean) and standard deviations (@fig-ppc-nonseasonal-sd and @fig-ppc-physical-sd) but not the shapes of sample distributions (@fig-ppc-nonseasonal-dens and @fig-ppc-physical-dens). Consequent, the models are likely to well represent conditional expectations but not to predict responses.
 
-The results are summarised in @fig-nonseasonal-cond-means. Left and right panels show the same thing from different point of views. Left panel shows pretty clearly that self-reported intensity/frequency of physical non-seasonal leisure activities decreases with age while self-reported intensity/frequency of mental leisure activities increases with age. The right panel shows pretty clearly that this tendency is the same in SA and nonSA participants.
+Posterior expected intensity ratings of the non-seasonal activities model are summarised in @fig-nonseasonal-cond-means and @tbl-nonseasonal-cond-means. According to the model and data, self-reported intensity of physical non-seasonal activities decreases with age whereas self-reported intensity of mental non-seasonal activities increases with age (left panel of @fig-nonseasonal-cond-means). These modality-dependent opposing tendencies seem to be invariant to the SA status (right panel of @fig-nonseasonal-cond-means). Pairwise comparisons of expected intensity rating between life decades conditional on SA status and activity modality are presented in @tbl-nonseasonal-pair-comps. The model predicts an expected decrease of intensity ratings of physical activites between 85 and 30 years old by `r sub( "-", "", sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'SA')$Estimate_logexp) )` points in SA (95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'nonSA')$pd_logexp`) and by `r sub( "-", "", sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'nonSA')$Estimate_logexp) )` points in non-SA (95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'nonSA')$pd_logexp`) participants. On the other, there is an expected increase of intensity ratings of mental activites between 85 and 30 years old by `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'SA')$Estimate_logexp)` points in SA (95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'nonSA')$pd_logexp`) and by `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'nonSA')$Estimate_logexp)` points in non-SA (95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'nonSA')$pd_logexp`) participants. According to the model, the difference between these trends in mental and physical activity ratings evolution is non-zero with high posterior probability in both SA ($\delta_{physical-mental}$ = `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'SA')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'SA')$pd_logexp`) and non-SA ($\delta_{physical-mental}$ = `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'nonSA')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'nonSA')$pd_logexp`) participants. On the other hand, the observed trends do not significantly differ between SA and non-SA participants in neither mental ($\delta_{SA-nonSA}$ = `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'mental')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'mental')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'mental')$pd_logexp`) nor physical ($\delta_{SA-nonSA}$ = `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'physical')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'physical')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'physical')$pd_logexp`) activities.
 
-![](../figures/conditional_means_nonseasonal_back_transformed_raw_scale.jpg){#fig-nonseasonal-cond-means}
+
+![Three-way interaction between decade of life, SuperAging, and activity modality in a model of self-reported leisure activities ratings.](../figures/conditional_means_nonseasonal_back_transformed_raw_scale.jpg){#fig-nonseasonal-cond-means}
+
 The results are summarised in @fig-physical-cond-means. Left and right panels show the same thing from different point of views. Left panel shows that self-reported intensity/frequency of non-seasonal leisure activities decreases more slowly with age than does self-reported intensity/frequency of seasonal leisure activities. It can also be seen there, that the slope (i.e., speed) of decrease is somewhat different between SA and nonSA groups. Better seen in the right panel is the finding that whereas the self-reported intensity/frequency of non-seasonal physical activities is practically identical between SA and nonSA groups, the SA participants reported less frequency/intensity of seasonal physical leisure activities across ages.
 
 ![](../figures/conditional_means_physical_back_transformed_raw_scale.jpg){#fig-physical-cond-means}
@@ -331,7 +338,149 @@ rbind.data.frame(
 ```
 
 ```{r}
-#| label: tbl-cond-effect
+#| label: tbl-nonseasonal-cond-means
+#| tbl-cap: Conditional expectations of self-reported non-seasonal activity intensities stratified by the decade of life, SuperAging status, and activity modality
+
+read.csv(here("tables","la_nonseasonal_conditional_means.csv"), sep = ",") %>%
+  
+  # prepare data
+  filter(scale == "explog") %>%
+  filter( !is.na(Activity_type) ) %>%
+  filter( !is.na(SA) ) %>%
+  mutate(
+    Modality = paste0(capitalise(Activity_type)," activities"),
+    SA = sub("non", "non-", SA),
+    Estimate = rprint(Estimate, 2),
+    `95% ETI` = unlist(sapply( 1:nrow(.), function(i) ciprint(c(ETI_low[i], ETI_high[i]), 2) ), use.names = F),
+    Decade = Time_bin
+  ) %>%
+  
+  # reallocate
+  select(Modality, SA, Decade, Estimate, `95% ETI`) %>%
+  pivot_wider (names_from = SA, values_from = c("Estimate", "95% ETI") ) %>%
+  relocate(`95% ETI_SA`, .after = Estimate_SA) %>%
+  relocate(`95% ETI_non-SA`, .after = `Estimate_non-SA`) %>%
+    
+  # format it
+  gt(groupname_col = "Modality") %>%
+  tab_spanner( columns = ends_with("_SA"), label = "SA") %>%
+  tab_spanner( columns = ends_with("_non-SA"), label = "non-SA") %>%
+  
+  # finish the columns
+  cols_align(columns = "Decade", align = "left") %>%
+  cols_align(columns = -2:-1, align = "center") %>%
+  cols_label(contains("Estimate") ~ "Estimate", contains("ETI") ~ "95% ETI")
+
+```
+
+```{r}
+#| label: tbl-nonseasonal-pair-comps
+#| tbl-cap: Pairwise comparisons of self-reported non-seasonal activity intensities across decades of life stratified by SuperAging status, and activity modality
+
+comps_nsea %>%
+  
+  # pre-format
+  filter( !grepl("[A-Za-z]", diff) ) %>%
+  filter( is.na(diff2) ) %>%
+  filter( !is.na(SA) ) %>%
+  mutate(
+    actype = paste0(capitalise(actype)," activities"),
+    SA = sub("non","non-",SA)
+  ) %>%
+  select(-ends_with("log"), -timebin, -diff2) %>%
+  pivot_wider(names_from = SA, values_from = ends_with("logexp") ) %>%
+  
+  # shuffle the columns
+  relocate(pd_logexp_SA, .after = Estimate_logexp_SA) %>%
+  relocate(`pd_logexp_non-SA`, .after = `Estimate_logexp_non-SA`) %>%
+  
+  # format it 
+  gt(groupname_col = "actype") %>%
+  tab_spanner( columns = ends_with("_SA"), label = "SA") %>%
+  tab_spanner( columns = ends_with("_non-SA"), label = "non-SA") %>%
+  
+  # columns finishing touches
+  cols_align(columns = "diff", align = "left") %>%
+  cols_align(columns = -2:-1, align = "center") %>%
+  cols_label(
+    diff ~ "Decade",
+    contains("Estimate") ~ "Estimate [95% ETI]", 
+    contains("pd") ~ "pd"
+  )
+
+```
+
+```{r}
+#| label: tbl-physical-cond-means
+#| tbl-cap: Conditional expectations of self-reported physical activity intensities stratified by the decade of life, SuperAging status, and seasoness
+
+read.csv(here("tables","la_physical_conditional_means.csv"), sep = ",") %>%
+  
+  # prepare data
+  filter(scale == "explog") %>%
+  filter( !is.na(Seasonal) ) %>%
+  filter( !is.na(SA) ) %>%
+  mutate(
+    Seasonal = case_when(Seasonal == TRUE ~ "Seasonal", Seasonal == FALSE ~ "Non-seasonal"),
+    SA = sub("non", "non-", SA),
+    Estimate = rprint(Estimate, 2),
+    `95% ETI` = unlist(sapply( 1:nrow(.), function(i) ciprint(c(ETI_low[i], ETI_high[i]), 2) ), use.names = F),
+    Decade = Time_bin
+  ) %>%
+    
+  # reallocate
+  select(Seasonal, SA, Decade, Estimate, `95% ETI`) %>%
+  pivot_wider (names_from = SA, values_from = c("Estimate", "95% ETI") ) %>%
+  relocate(`95% ETI_SA`, .after = Estimate_SA) %>%
+  relocate(`95% ETI_non-SA`, .after = `Estimate_non-SA`) %>%
+  
+  # format it
+  gt(groupname_col = "Seasonal") %>%
+  tab_spanner( columns = ends_with("_SA"), label = "SA") %>%
+  tab_spanner( columns = ends_with("_non-SA"), label = "non-SA") %>%
+  
+  # finish the columns
+  cols_align(columns = "Decade", align = "left") %>%
+  cols_align(columns = -2:-1, align = "center") %>%
+  cols_label(contains("Estimate") ~ "Estimate", contains("ETI") ~ "95% ETI")
+
+```
+
+```{r}
+#| label: tbl-physical-pair-comps
+#| tbl-cap: Pairwise comparisons of self-reported physical activity intensities across decades of life stratified by SuperAging status, and seasoness
+
+comps_phys %>%
+  
+  # pre-format
+  filter( !grepl("[A-Za-z]", diff) ) %>%
+  filter( is.na(diff2) ) %>%
+  filter( !is.na(SA) ) %>%
+  mutate(
+   season = case_when(season == TRUE ~ "Seasonal", season == FALSE ~ "Non-seasonal"),,
+   SA = sub("non","non-",SA)
+  ) %>%
+  select(-ends_with("log"), -timebin, -diff2) %>%
+  pivot_wider(names_from = SA, values_from = ends_with("logexp") ) %>%
+  
+  # shuffle the columns
+  relocate(pd_logexp_SA, .after = Estimate_logexp_SA) %>%
+  relocate(`pd_logexp_non-SA`, .after = `Estimate_logexp_non-SA`) %>%
+  
+  # format it 
+  gt(groupname_col = "season") %>%
+  tab_spanner( columns = ends_with("_SA"), label = "SA") %>%
+  tab_spanner( columns = ends_with("_non-SA"), label = "non-SA") %>%
+  
+  # columns finishing touches
+  cols_align(columns = "diff", align = "left") %>%
+  cols_align(columns = -2:-1, align = "center") %>%
+  cols_label(
+    diff ~ "Decade",
+    contains("Estimate") ~ "Estimate [95% ETI]", 
+    contains("pd") ~ "pd"
+  )
+
 ```
 
 ![](../figures/ppc_stat_mean_nonseasonal_ordered_time.jpg){#fig-ppc-nonseasonal-mean}
