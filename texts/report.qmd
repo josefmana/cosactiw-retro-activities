@@ -15,20 +15,21 @@ author:
         department: OVV
         city: Prague
   - name: Hana Georgi
-    corresponding: true
+    corresponding: false
     affiliations:
       - name: PVSPS
         department: OVV
         city: Prague
-abstract: ""
-keywords: [cool Bayes stats]
-author-note:
-  disclosures:
-    conflict of interest: The authors has no conflict of interest to declare.
+  - name: Jiří Lukavský
+    corresponding: false
+    affiliations:
+      - name: PVSPS
+        department: OVV
+        city: Prague
 format:
-  apaquarto-pdf: default
-floatsintext: true
+  docx: default
 bibliography: references.bib
+csl: apa.csl
 echo: false
 warning: false
 ---
@@ -52,9 +53,9 @@ source( here("scripts","utils.R") ) # in-house functions
 
 ### VLS-ALQ
 
-Dimensionality of the VLS-ALQ questionnaire scale in our sample was first checked via the confirmatory factor analysis (CFA) as implemented in the "lavaan" R package [@lavaan; @rsoft]. A three-factor model with separate "Private," "Public," and "Religious" independent dimensions, a second order factor model with separate "Private," "Public," and "Religious" and a superordinate "Total" factor, and separate unidimensional models for the "Private" and the "Public" subscales were fitted to data. Models were evaluated via Tucker Lewis Index (TLI), Comparative Fit Index (CFI) and root-mean-square-error-aproximation (RMSEA) with values of TLI > .9, CFI > .9, and RMSEA < .08 considered to indicate adequate fit. Next, internal consistency of the full questionnaire and the "Public" and the "Private" subscales was estimated via the Cronbach's $\alpha$ and Guttman's Lambda 6 (G6). Internal consistency indexes were estimated in the "psych" R package using the default settings [@psych; @rsoft]. Following the classical recommendations for interpretation of coefficient $\alpha$ [@streiner2003; @nunnally1994], we consider values above 0.7 as sufficient for early research, values above 0.8 as sufficient for basic research, and values above 0.9 as necessary for clinical use.
+Dimensionality of the VLS-ALQ questionnaire in was checked via confirmatory factor analysis (CFA) as implemented in the "lavaan" R package [@lavaan; @rsoft]. A three-factor model with separate "Private," "Public," and "Religious" independent dimensions; a second order factor model with separate "Private," "Public," and "Religious" and a superordinate "Total" factor; and separate unidimensional models for the "Private" and the "Public" subscales were fitted to the data. Models were evaluated via the Tucker Lewis Index (TLI), the Comparative Fit Index (CFI) and the root-mean-square-error-aproximation (RMSEA) with values of TLI > .9, CFI > .9, and RMSEA < .08 considered to indicate adequate fit. Next, internal consistency of the total score, the "Public" and the "Private" subscales was estimated via Cronbach's $\alpha$ and Guttman's Lambda 6 (G6) coefficients. Internal consistency indexes were estimated using the "psych" R package with default settings [@psych; @rsoft]. Following the classical recommendations for interpretation of coefficient $\alpha$ [@streiner2003; @nunnally1994], values above 0.7 were considered sufficient for early research, values above 0.8 sufficient for basic research, and values above 0.9 necessary for clinical use.
 
-Sum scores of the full VLS-ALQ questionnaire as well as its subscales were described by their in-sample means $\pm$ standard deviations for SA and non-SA groups separately. The null hypothesis that SA and non-SA groups' means are equal was tested via the independent sample *t*-test with Welch modification to the degrees of freedom and effect size of mean differences characterised by Cohen's d. The null hypothesis of stachastical uniformity between distribution of test scores in SA and non-SA groups was tested via the Mann-Whitney U test with effect size characterised by Vargha and Delaney A as implemented in the *effsize* R package [@effsize; @vargha2000]. Decision threshold for claiming statistically significant deviance from a null hypothesis in these comparisons was set at p < .05.
+Sum scores of the full VLS-ALQ questionnaire as well as its subscales were described by their means $\pm$ standard deviations for SA and non-SA groups separately. The null hypothesis that SA and non-SA groups' means are equal was tested via independent sample *t*-test with Welch modification to the degrees of freedom and effect size of mean differences characterised by Cohen's d. The null hypothesis of stachastical uniformity of test scores' distributions in SA and non-SA groups was tested via Mann-Whitney U test with effect size characterised by Vargha and Delaney A as implemented in the "effsize" R package [@effsize; @vargha2000]. Decision threshold for claiming statistically significant deviance from a null hypothesis was set at p < .05.
 
 ### COBRA-A
 
@@ -62,17 +63,17 @@ Sum scores of the full VLS-ALQ questionnaire as well as its subscales were descr
 
 ### Leisure activities
 
-The self-reported leisure activities' distributions were described in three ways: (i) as counts of activity type per participant, (ii) as a number of participants reporting at least one activity of each activity type, and (iii) as a time-series of expected means of self-reported intensity ratings.
+Self-reported leisure activities' distributions were described in three ways: (i) as counts of activity type per participant, (ii) as a number of participants reporting at least one activity of each activity type, and (iii) as a time-series of expected means of self-reported intensity ratings.
 
-The counts of activity type were described separately for SA and non-SA groups stratified by modality (physical, mental, both) and seasoness (seasonal, non-seasonal) by their in-sample means $\pm$ standard deviations. Null hypotheses of equal means and stochastical uniformity of SA versus non-SA activity type counts distributions were tested via *t*-test with Welch modification to the degrees of freedom and the Mann-Whitney U test respectively. Effect sizes of differences between SA and non-SA means and distributions were described by Cohen's d and Vargha and Delaney A (VD.A) as implemented in the "effsize" R package [@effsize; @vargha2000]. Decision threshold for claiming statistically significant deviance from a null hypothesis in these comparisons was set at p < .05.^[***Note from Pepa, not to be included in the final text. I used the "vanilla approach" of testing nulls about mean differences and stochastical equality, however, the very viable alternative would be a set of GLMs (regressions) with Poisson or Negative Binomial likelihood which are good candidates for modelling count variables. The choice between methods depends on the type of answer we are looking for (i.e., the estimand). Do we want just compare distributions of these counts with not many assumptions? Then the vanilla approach might work well. Or do we want a way to compare distributions and derive sensible predictions? Then the "regression approach" would be better. Do we want causal instead of descriptive estimates? Then we need to put more work into the pre-statistic scientific model building. Pick your poison I guess :-D***]
+Counts of activity type were described by their in-sample means $\pm$ standard deviations separately for SA and non-SA groups stratified by modality (physical, mental, both) and seasoness (seasonal, non-seasonal). Null hypotheses of equal means and stochastical uniformity of SA versus non-SA activity type counts distributions were tested via *t*-test with Welch modification to the degrees of freedom and Mann-Whitney U test respectively. Effect sizes of differences between SA and non-SA means and distributions were described by Cohen's d and Vargha and Delaney A (VD.A) as implemented in the "effsize" R package [@effsize; @vargha2000]. Decision threshold for claiming statistically significant deviance from a null hypothesis was set at p < .05.^[***Note from Pepa, not to be included in the final text. I used the "vanilla approach" of testing nulls about mean differences and stochastical uniformity, however, a very viable alternative would be a set of GLMs (regressions) with Poisson or Negative Binomial likelihood which are good candidates for modelling count variables. The choice between methods depends on the type of answer we are looking for (i.e., the estimand). Do we want just compare distributions of these counts with not many assumptions? Then the vanilla approach might work well. Or do we want a way to compare distributions and derive sensible predictions? Then the "regression approach" would be better. Do we want causal instead of descriptive estimands? Then we need to put more work into the pre-statistic scientific model building. Pick your poison I guess :-D***]
 
-The number of participants reporting at least one activity belonging to a given activity type was described by contingency tables separately for each modality (physical, mental, both), seasoness (seasonal, non-seasonal), and SA status (SA, non-SA). Within each modality/seasoness combination, the Pearson's $\chi^2$ test of the null hypothesis that SA status and activity type are independent of each other was performed. The strength of association between SA status and activity type was described by Cramérs' V as implemented in the "rcompanion" package [@rcompanion]. Decision threshold for claiming statistically significant deviance from a null hypothesis in these comparisons was set at p < .05.
+The number of participants reporting at least one activity belonging to a given activity type was described by contingency tables of activity typs (rows) and SA status (SA, non-SA, columns) separately for each modality (physical, mental) and seasoness (seasonal, non-seasonal). Within each modality/seasoness combination, Pearson's $\chi^2$ test of the null hypothesis that SA status and activity type are independent of each other was performed. The strength of association between SA status and activity type was described by Cramérs' V as implemented in the "rcompanion" package [@rcompanion]. Decision threshold for claiming statistically significant deviance from a null hypothesis was set at p < .05.
 
-Finally, the expected means of self-reported intensities of single leisure activities across lifetime were modelled via a set of Bayesian Generalised Linear Mixed Models (GLMMs) with time (decade of life) as a monotonic predictor [@bürkner2017b; @bürkner2020]. The GLMMs (specified below) were fitted to data and used to generate posterior draws of the expected value of the activtiy intensity conditional on different combinations of life decade, SA status, seasoness and modality as predictors of interest. These posterior draws were then described by their medians and 95% equal tailed posterior intervals (ETIs). Moreover, pairwise comparisons between expected intensity conditional on decades of life, SA status, modality and seasoness were directly compared and evaluated by the probability of direction (*pd*) index of effect existence [@makowski2019]^[The *pd* is a so called index of effect existence quantifying the certainty associated with the most probable direction of a posterior distribution. Following guidelines of @makowski2019b it can be interpreted as a continuous index whereby *pd* ≥ 95% indicates uncertain association, *pd* > 95% indicates possibly existing association, *pd* > 97% indicates likely existing association, *pd* > 99% indicates probably existing association, and *pd* > 99.9% indicates almost certainly existing association.]. All pairwise comparisons estimates are denoted $\delta_{x-y}$ throughout the article.
+Finally, the expected means of self-reported intensities of single leisure activities across lifetime were modelled by a set of Bayesian Generalised Linear Mixed Models (GLMMs) with time (half-decades of adult life) as a monotonic predictor [@bürkner2017b; @bürkner2020]. The GLMMs (specified below) were fitted to data and used to generate posterior draws of the expected value of the activtiy intensity conditional on different combinations of half-decade of life, SA status, seasoness and modality as predictors of interest. These posterior draws were then described by their medians and 95% equal tailed posterior intervals (ETIs). Moreover, pairwise comparisons between expected intensity conditional on half-decades of life, SA status, modality and seasoness were directly compared and evaluated by the probability of direction (*pd*) index [@makowski2019]^[The *pd* is a so called index of effect existence quantifying the certainty associated with the most probable direction of a posterior distribution. Following guidelines of @makowski2019 it can be interpreted as a continuous index whereby *pd* ≥ 95% indicates uncertain association, *pd* > 95% indicates possibly existing association, *pd* > 97% indicates likely existing association, *pd* > 99% indicates probably existing association, and *pd* > 99.9% indicates almost certainly existing association.]. All pairwise comparisons estimates are denoted as $\delta_{x-y}$ throughout the article.
 
-Since there was no mental activity that would also be seasonal, two GLMMs were fitted. In the first model (the *'non-seasonal activities model'*), the self-reported intensity of non-seasonal activities was regressed on the decade of life (monotonic ordered predictor), SA status, modality, and their two- and three-way interactions on group-level as well as correlated participant- and activity type-specific intercepts and slopes across decades. This model was used to estimate expectations of non-seasonal activities' intensity ratings conditional on a decade of life, SA status and activity modality. In the second model (the *'physical activities model'*), the self-reported intensity of physical activities was regressed on the decade of life (monotonic ordered predictor), SA status, seasoness, and their two- and three-way interactions on group-level as well as correlated participant- and activity type-specific intercepts and slopes across decades. This model was used to estimate expectations of intensity ratings conditional on decade of life, SA status and seasoness of physical activities.^[***Another message from Pepa. It would be best to add full model specification to Appendix. I will do so but it will take some time so I would wait until the article takes a more concrete form on itself before I allocate time to Appendix activity.***]
+Since there was no mental activity that would be also seasonal, two GLMMs were fitted. In the first model (the *"non-seasonal activities model"*), self-reported intensity of non-seasonal activities was regressed on the half-decade of life (monotonic ordered predictor), SA status, modality, and their two- and three-way interactions on group-level as well as correlated participant- and activity type-specific intercepts and slopes across half-decades. This model was used to estimate expectations of non-seasonal activities' intensity ratings conditional on a half-decade of life, SA status and activity modality. In the second model (the *"physical activities model"*), self-reported intensity of physical activities was regressed on the half-decade of life (monotonic ordered predictor), SA status, seasoness, and their two- and three-way interactions on group-level as well as correlated participant- and activity type-specific intercepts and slopes across half-decades. This model was used to estimate expectations of intensity ratings conditional on half-decade of life, SA status and seasoness of physical activities.^[***Another message from Pepa. It would be best to add full model specification to the Appendix. I will do so but it will take some time so I would wait until the article takes a more concrete form on itself before I allocate time to Appendix activity.***]
 
-All GLMMs were fitted using Stan’s (version `r stan_version()`) build-in Hamiltonian Monte Carlo sampler accessed via R version `r with( version, paste(major,minor,sep=".") )` using package “brms” [@bürkner2017; @rsoft; @stan]. Four parallel chains were run each for 2,000 iterations for each GLMM. The first 1,000 iterations served as a warm-up and were discarded. Convergence was checked numerically by inspection of the $\hat{R}s$ and visually by inspection of trace plots. Posterior predictive checks for each combination of predictors was used to check whether the models reliably reproduce in-sample means and standard deviations. This study’s design and its analysis were not pre-registered. The data are not publicly available due to privacy or ethical restrictions. The computer code used in the data analysis can be accessed at [https://github.com/josefmana/cosactiw-retro-activities.git](https://github.com/josefmana/cosactiw-retro-activities.git).
+All GLMMs were fitted using Stan’s (version `r stan_version()`) build-in Hamiltonian Monte Carlo sampler accessed via R version `r with( version, paste(major,minor,sep=".") )` using package “brms” [@bürkner2017; @rsoft; @stan]. Four parallel chains were run each for 2,000 iterations for each GLMM. The first 1,000 iterations served as a warm-up and were discarded. Convergence was checked numerically by inspection of the $\hat{R}s$ and visually by inspection of trace plots. Posterior predictive checks for each combination of primary predictors was used to check whether the models reliably reproduce in-sample means and standard deviations. This study’s design and its analysis were not pre-registered. The data are not publicly available due to privacy or ethical restrictions. The computer code used in the data analysis can be accessed at [https://github.com/josefmana/cosactiw-retro-activities.git](https://github.com/josefmana/cosactiw-retro-activities.git).
 
 # Results
 
@@ -104,7 +105,7 @@ demo <-
 
 ```
 
-Overall, there was a total of `r N['SA', ]` women categorised as SA (`r demo['Age_years', 'SA']` years old, `r demo['Education_years', 'SA']` years of education), and `r N['nonSA', ]` women categorised as non-SA (`r demo['Age_years', 'nonSA']` years old, `r demo['Education_years', 'nonSA']` years of education). The null hypothesis of equal means was not rejected for neither age (t(`r demo['Age_years', 'df']`) = `r demo['Age_years', 't']`, p = `r demo['Age_years', 'p']`) nor education (t(`r demo['Education_years', 'df']`) = `r demo['Education_years', 't']`, p = `r demo['Education_years', 'p']`).
+Overall, there was `r N['SA', ]` women categorised as SA (`r demo['Age_years', 'SA']` years old, `r demo['Education_years', 'SA']` years of education), and `r N['nonSA', ]` women categorised as non-SA (`r demo['Age_years', 'nonSA']` years old, `r demo['Education_years', 'nonSA']` years of education) in the sample. The null hypothesis of equal means was not rejected for either age (*t*(`r demo['Age_years', 'df']`) = `r demo['Age_years', 't']`, p = `r demo['Age_years', 'p']`) or education (*t*(`r demo['Education_years', 'df']`) = `r demo['Education_years', 't']`, p = `r demo['Education_years', 'p']`).
 
 ## VLS-ALQ
 
@@ -113,7 +114,7 @@ Overall, there was a total of `r N['SA', ]` women categorised as SA (`r demo['Ag
 
 # prepare a table with internal consistency measures
 icon <-
-  read.csv( here("tables","vls_reliabilities.csv"), sep = "," ) %>%
+  read.csv( here("tables","_vls_reliabilities.csv"), sep = "," ) %>%
   select(Scale, std.alpha, G6.smc.) %>%
   filter( !is.na(std.alpha) ) %>%
   column_to_rownames("Scale") %>%
@@ -121,13 +122,13 @@ icon <-
 
 ```
 
-The 'total' VLS-ALQ scale ($\alpha$ = `r icon['Total','std.alpha']`, G6 = `r icon['Total','G6.smc.']`), as well as the 'private' subscale ($\alpha$ = `r icon['Private','std.alpha']`, G6 = `r icon['Private','G6.smc.']`) and the 'public' subscale ($\alpha$ = `r icon['Public','std.alpha']`, G6 = `r icon['Public','G6.smc.']`) showed low levels of internal consistency an inadequate fit of CFAs to data in the current sample (see @tbl-vls-reli). Consequently, the following results ought to be interpreted with the low internal consistency in mind as this could severely decrease statistical power. The statistical comparisons of means and distributions of VLS-ALQ scores in non-SA versus SA participants are presented in @tbl-vls-comps. No null hypothesis was rejected based on our data.
+The "total" VLS-ALQ scale ($\alpha$ = `r icon['Total','std.alpha']`, G6 = `r icon['Total','G6.smc.']`), as well as the "private" subscale ($\alpha$ = `r icon['Private','std.alpha']`, G6 = `r icon['Private','G6.smc.']`) and the "public" subscale ($\alpha$ = `r icon['Public','std.alpha']`, G6 = `r icon['Public','G6.smc.']`) showed low levels of internal consistency an inadequate fit of CFAs to data in the current sample (see @tbl-vls-reli). Consequently, following results ought to be interpreted with the low internal consistency in mind as this could severely decrease statistical power. The statistical comparisons of means and distributions of VLS-ALQ scores in non-SA versus SA participants are presented in @tbl-vls-comps. No null hypothesis was rejected based on our data.
 
 ```{r}
 #| label: tbl-vls-comps
 #| tbl-cap: Description and statistical comparison of VLS-ALQ scale scores
 
-read.csv(here("tables","vls_sum_scores.csv"), sep = ";") %>%
+tab1 <- read.csv(here("tables","_vls_sum_scores.csv"), sep = ";") %>%
   
   # keep only scales
   filter( Scale %in% paste0( "VLS_", c("total", "private", "public", "I_attend_church_services") ) ) %>%
@@ -156,7 +157,10 @@ read.csv(here("tables","vls_sum_scores.csv"), sep = ";") %>%
     t_stat ~ "t",
     starts_with("p_") ~ "p"
   )
-  
+
+# save & show it
+gtsave( data = tab1, filename = here("tables","_Table_1.docx") )
+tab1
 
 ```
 
@@ -169,18 +173,18 @@ read.csv(here("tables","vls_sum_scores.csv"), sep = ";") %>%
 
 # read the table for further work
 la_counts <-
-  read.csv(here("tables","la_activities_counts.csv"), sep = ";") %>%
+  read.csv(here("tables","_la_activities_counts.csv"), sep = ";") %>%
   filter( !(category == "flexibility_health_exercise" & season == "Seasonal & Non-seasonal") )
 
 ```
 
-Counts of activities per participant per SA and non-SA group and their comparison are presented in @tbl-la-counts. No tested null hypothesis was rejected apart from the hypothesis of zero difference in means (t(`r subset(la_counts, as.numeric(p_ttest) < .05 )$df`) = `r subset(la_counts, as.numeric(p_ttest) < .05 )$t_stat`, p = `r subset(la_counts, as.numeric(p_ttest) < .05 )$p_ttest`) and stochastical uniformity (W = `r subset(la_counts, as.numeric(p_mannwhitney) < .05 )$W`, p = `r subset(la_counts, as.numeric(p_mannwhitney) < .05 )$p_mannwhitney`) of distributions of counts of `r subset(la_counts, as.numeric(p_ttest) < .05 )$category`. The SA participants reported relatively more `r subset(la_counts, as.numeric(p_ttest) < .05 )$category` than non-SA participants (SA: `r subset(la_counts, as.numeric(p_ttest) < .05 )$SA`, non-SA: `r subset(la_counts, as.numeric(p_ttest) < .05 )$nonSA`, Cohen's d = `r subset(la_counts, as.numeric(p_ttest) < .05 )$cohens_d`, VD.A = `r subset(la_counts, as.numeric(p_mannwhitney) < .05 )$VD.A`).^[***Another note to be deleted later. If we opt to use any adjustment for multiple comparisons, these hypotheses will remain unrejected as well.***]
+Counts of activities per participant per SA and non-SA group and their comparison are presented in @tbl-la-counts. No tested null hypothesis was rejected with the exception of the hypothesis of zero difference in means *(*t*(`r subset(la_counts, as.numeric(p_ttest) < .05 )$df`) = `r subset(la_counts, as.numeric(p_ttest) < .05 )$t_stat`, p = `r subset(la_counts, as.numeric(p_ttest) < .05 )$p_ttest`) and stochastical uniformity (W = `r subset(la_counts, as.numeric(p_mannwhitney) < .05 )$W`, p = `r subset(la_counts, as.numeric(p_mannwhitney) < .05 )$p_mannwhitney`) of distributions of counts of `r subset(la_counts, as.numeric(p_ttest) < .05 )$category`. The SA participants reported relatively more `r subset(la_counts, as.numeric(p_ttest) < .05 )$category` than non-SA participants (SA: `r subset(la_counts, as.numeric(p_ttest) < .05 )$SA`, non-SA: `r subset(la_counts, as.numeric(p_ttest) < .05 )$nonSA`, Cohen's d = `r subset(la_counts, as.numeric(p_ttest) < .05 )$cohens_d`, VD.A = `r subset(la_counts, as.numeric(p_mannwhitney) < .05 )$VD.A`).^[***Another note to be deleted later. If we opt to use any adjustment for multiple comparisons, these hypotheses will remain unrejected as well.***]
 
 ```{r}
 #| label: tbl-la-counts
 #| tbl-cap: Description and statistical comparison of activity counts in SA and non-SA groups
 
-la_counts %>%
+tab2 <- la_counts %>%
   
   gt(groupname_col = "season") %>%
   cols_align(columns = -c(1:3), align = "center") %>%
@@ -202,6 +206,10 @@ la_counts %>%
     type ~ "Modality"
   )
 
+# save & show it
+gtsave( data = tab2, filename = here("tables","_Table_2.docx") )
+tab2
+
 ```
 
 ### Number of participants reporting an activity
@@ -211,18 +219,18 @@ la_counts %>%
 
 # read the chi-squared test results
 lanums <-
-  read.csv(here("tables","la_participants_numbers_chisquared.csv"), sep = ",") %>%
+  read.csv(here("tables","_la_participants_numbers_chisquared.csv"), sep = ",") %>%
   mutate( p = zerolead(p) )
 
 ```
 
-Overall distribution of the number of participants engaging in at least one activity from each activity type is presented in @tbl-la-nums-all. Based on the data, the null hypothesis of activity type and SA status independence was not rejected for neither physical ($\chi^2$(`r subset(lanums, season == "all" & type == "physical")$df`) = `r subset(lanums, season == "all" & type == "physical")$chisq`, p = `r subset(lanums, season == "all" & type == "physical")$p`, Cramér's V = `r subset(lanums, season == "all" & type == "physical")$cramer_v`) nor mental ($\chi^2$(`r subset(lanums, season == "non-seasonal" & type == "mental")$df`) = `r subset(lanums, season == "non-seasonal" & type == "mental")$chisq`, p = `r subset(lanums, season == "non-seasonal" & type == "mental")$p`, Cramér's V = `r subset(lanums, season == "non-seasonal" & type == "mental")$cramer_v`) activities. Furthermore, in the case of physical activities, the null hypothesis of independence between distributions of activity type and SA status was not rejected for neither non-seasonal ($\chi^2$(`r subset(lanums, season == "non-seasonal" & type == "physical")$df`) = `r subset(lanums, season == "non-seasonal" & type == "physical")$chisq`, p = `r subset(lanums, season == "non-seasonal" & type == "physical")$p`, Cramér's V = `r subset(lanums, season == "non-seasonal" & type == "physical")$cramer_v`) nor seasonal ($\chi^2$(`r subset(lanums, season == "seasonal" & type == "physical")$df`) = `r subset(lanums, season == "seasonal" & type == "physical")$chisq`, p = `r subset(lanums, season == "seasonal" & type == "physical")$p`, Cramér's V = `r subset(lanums, season == "seasonal" & type == "physical")$cramer_v`) activities (see @tbl-la-nums-physical).
+The overall distribution of the number of participants engaging in at least one activity from each activity type is presented in @tbl-la-nums-all. Based on the data, the null hypothesis of activity type and SA status independence was not rejected for either physical ($\chi^2$(`r subset(lanums, season == "all" & type == "physical")$df`) = `r subset(lanums, season == "all" & type == "physical")$chisq`, p = `r subset(lanums, season == "all" & type == "physical")$p`, Cramér's V = `r subset(lanums, season == "all" & type == "physical")$cramer_v`) or mental ($\chi^2$(`r subset(lanums, season == "non-seasonal" & type == "mental")$df`) = `r subset(lanums, season == "non-seasonal" & type == "mental")$chisq`, p = `r subset(lanums, season == "non-seasonal" & type == "mental")$p`, Cramér's V = `r subset(lanums, season == "non-seasonal" & type == "mental")$cramer_v`) activities. Furthermore, in the case of physical activities, the null hypothesis of independence between distributions of activity type and SA status was not rejected for either non-seasonal ($\chi^2$(`r subset(lanums, season == "non-seasonal" & type == "physical")$df`) = `r subset(lanums, season == "non-seasonal" & type == "physical")$chisq`, p = `r subset(lanums, season == "non-seasonal" & type == "physical")$p`, Cramér's V = `r subset(lanums, season == "non-seasonal" & type == "physical")$cramer_v`) or seasonal ($\chi^2$(`r subset(lanums, season == "seasonal" & type == "physical")$df`) = `r subset(lanums, season == "seasonal" & type == "physical")$chisq`, p = `r subset(lanums, season == "seasonal" & type == "physical")$p`, Cramér's V = `r subset(lanums, season == "seasonal" & type == "physical")$cramer_v`) activities (see @tbl-la-nums-physical).
 
 ```{r}
 #| label: tbl-la-nums-all
 #| tbl-cap: Number of participants reporting at least one mental or physical activity of each type
 
-read.csv(here("tables","la_all_participants_numbers.csv"), sep = ",") %>%
+tab3 <- read.csv(here("tables","_la_all_participants_numbers.csv"), sep = ",") %>%
   
   select( -ends_with("SA") ) %>%
   relocate(nonSA_perc, .before = SA_perc) %>%
@@ -235,6 +243,10 @@ read.csv(here("tables","la_all_participants_numbers.csv"), sep = ",") %>%
     SA_perc ~ "SA",
     nonSA_perc~"non-SA"
   )
+
+# save & show it
+gtsave( data = tab3, filename = here("tables","_Table_3.docx") )
+tab3
 
 ```
 
@@ -252,20 +264,20 @@ fit <- list(
 rhatmax <- ubound( max( sapply(names(fit), function(i) max( rhat(fit[[i]]) ) ) ), 3)
 
 # extract comparisons
-comps_phys <- read.csv(here("tables","la_physical_pairwise_comparisons.csv"), sep = ";")
-comps_nsea <- read.csv(here("tables","la_nonseasonal_pairwise_comparisons.csv"), sep = ";")
+comps_phys <- read.csv(here("tables","_la_physical_pairwise_comparisons.csv"), sep = ";")
+comps_nsea <- read.csv(here("tables","_la_nonseasonal_pairwise_comparisons.csv"), sep = ";")
 
 ```
 
-Both GLMMs converged in the specified number of iterations to a stationary posterior distribution ($\hat{R}s \leq `r rhatmax`$). Both models showed adequate reproduction of sample means (@fig-ppc-nonseasonal-mean and @fig-ppc-physical-mean) and standard deviations (@fig-ppc-nonseasonal-sd and @fig-ppc-physical-sd) but not the shapes of sample distributions (@fig-ppc-nonseasonal-dens and @fig-ppc-physical-dens). Consequent, the models are likely to well represent conditional expectations but not to predict responses.
+Both GLMMs converged in the specified number of iterations to a stationary posterior distribution ($\hat{R}s \leq `r rhatmax`$). Both models showed adequate reproduction of sample means (@fig-ppc-nonseasonal-mean and @fig-ppc-physical-mean) and standard deviations (@fig-ppc-nonseasonal-sd and @fig-ppc-physical-sd) but not the shapes of sample distributions (@fig-ppc-nonseasonal-dens and @fig-ppc-physical-dens). Consequently, the models likely well represent conditional expectations but they do not reliably predict responses.
 
-Posterior expected intensity ratings of the *'non-seasonal activities model'* are summarised in @fig-nonseasonal-cond-means and @tbl-nonseasonal-cond-means. According to the model and data, self-reported intensity of physical non-seasonal activities decreases with age whereas self-reported intensity of mental non-seasonal activities increases with age (left panel of @fig-nonseasonal-cond-means). These modality-dependent opposing tendencies seem to be invariant to the SA status (right panel of @fig-nonseasonal-cond-means). Pairwise comparisons of expected intensity rating between life decades conditional on SA status and activity modality are presented in @tbl-nonseasonal-pair-comps. The model predicts that average intensity ratings of physical activities decrease of between 85 and 30 years oo age by `r sub( "-", "", sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'SA')$Estimate_logexp) )` points in SA (95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'nonSA')$pd_logexp`) and by `r sub( "-", "", sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'nonSA')$Estimate_logexp) )` points in non-SA (95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'nonSA')$pd_logexp`) participants. On the other, it predicts that average intensity ratings of mental activities increase between 85 and 30 years of age by `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'SA')$Estimate_logexp)` points in SA (95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'nonSA')$pd_logexp`) and by `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'nonSA')$Estimate_logexp)` points in non-SA (95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'nonSA')$pd_logexp`) participants. According to the model, the difference between these trends in mental and physical activity ratings evolution is non-zero with high posterior probability in both SA ($\delta_{physical-mental}$ = `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'SA')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'SA')$pd_logexp`) and non-SA ($\delta_{physical-mental}$ = `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'nonSA')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'nonSA')$pd_logexp`) participants. On the other hand, these trends do not significantly differ between SA and non-SA participants in neither mental ($\delta_{SA-nonSA}$ = `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'mental')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'mental')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'mental')$pd_logexp`) nor physical ($\delta_{SA-nonSA}$ = `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'physical')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'physical')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'physical')$pd_logexp`) activities.
+Posterior expected intensity ratings predicted by the *"non-seasonal activities model"* are summarised in @fig-nonseasonal-cond-means and @tbl-nonseasonal-cond-means. According to the model and data, self-reported intensity of physical non-seasonal activities decreases with age whereas self-reported intensity of mental non-seasonal activities increases with age (left panel of @fig-nonseasonal-cond-means). These modality-dependent opposing tendencies seem to be invariant to the SA status (right panel of @fig-nonseasonal-cond-means). Pairwise comparisons of expected intensity rating between life half-decades conditional on SA status and activity modality are presented in @tbl-nonseasonal-pair-comps. The model predicts that average intensity ratings of physical activities decrease between 85 and 30 years of age by `r sub( "-", "", sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'SA')$Estimate_logexp) )` points in SA (95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'nonSA')$pd_logexp`) and by `r sub( "-", "", sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'nonSA')$Estimate_logexp) )` points in non-SA (95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & actype == 'physical' & SA == 'nonSA')$pd_logexp`) participants. On the other, it predicts that average intensity ratings of mental activities increase between 85 and 30 years of age by `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'SA')$Estimate_logexp)` points in SA (95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'nonSA')$pd_logexp`) and by `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'nonSA')$Estimate_logexp)` points in non-SA (95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & actype == 'mental' & SA == 'nonSA')$pd_logexp`) participants. According to the model, the difference between these trends in mental and physical activity ratings evolution is non-zero with high posterior probability on the level of almost certainly existing association in both SA ($\delta_{physical-mental}$ = `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'SA')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'SA')$pd_logexp`) and non-SA ($\delta_{physical-mental}$ = `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'nonSA')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & diff2 == 'physical - mental' & SA == 'nonSA')$pd_logexp`) participants. On the other hand, these trends do not significantly differ between SA and non-SA participants in either mental ($\delta_{SA-nonSA}$ = `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'mental')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'mental')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'mental')$pd_logexp`) or physical ($\delta_{SA-nonSA}$ = `r sub(" .*", "", subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'physical')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'physical')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_nsea, diff == '85 - 30' & diff2 == 'SA - nonSA' & actype == 'physical')$pd_logexp`) activities.
 
-![Three-way interaction between decade of life, SuperAging, and activity modality in a model of self-reported non-seasonal leisure activities ratings.](../figures/conditional_means_nonseasonal_back_transformed_raw_scale.jpg){#fig-nonseasonal-cond-means}
+![Three-way interaction between half-decade of life, SuperAging, and activity modality in a model of self-reported non-seasonal leisure activities ratings.](../figures/_conditional_means_nonseasonal_back_transformed_raw_scale.jpg){#fig-nonseasonal-cond-means}
 
-Finally, posterior expected intensity ratings of the *'physical activities model'* are summarised in @fig-physical-cond-means and @tbl-physical-cond-means. According to the model and data, self-reported intensity of non-seasonal physical activities decreases with age more slowly than intensity of seasonal physical activities (left panel of @fig-physical-cond-means). Although SA and non-SA participants report similar levels of non-seasonal physical activities, SA participants report relatively lower intensities of seasonal physical activities across the decades of adult life (right panel of @fig-physical-cond-means). Pairwise comparisons of expected intensity rating between life decades conditional on SA status and seasoness are presented in @tbl-physical-pair-comps. The model predicts that average intensity ratings of physical non-seasonal activities decrease of between 85 and 30 years of age by `r sub( "-", "", sub(" .*", "", subset(comps_phys, diff == '85 - 30' & season == FALSE & SA == 'SA')$Estimate_logexp) )` points in SA (95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & season == FALSE & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & season == FALSE & SA == 'SA')$pd_logexp`) and by `r sub( "-", "", sub(" .*", "", subset(comps_phys, diff == '85 - 30' & season == FALSE & SA == 'nonSA')$Estimate_logexp) )` points in non-SA (95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & season == FALSE & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & season == FALSE & SA == 'nonSA')$pd_logexp`) participants. On the other, it predicts that average intensity ratings of seasonal physical activities decrease between 85 and 30 years of age by `r sub( "-", "", sub(" .*", "", subset(comps_phys, diff == '85 - 30' & season == TRUE & SA == 'SA')$Estimate_logexp) )` points in SA (95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & season == TRUE & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & season == TRUE & SA == 'SA')$pd_logexp`) and by `r sub( "-", "", sub(" .*", "", subset(comps_phys, diff == '85 - 30' & season == TRUE & SA == 'nonSA')$Estimate_logexp) )` points in non-SA (95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & season == TRUE & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & season == TRUE & SA == 'nonSA')$pd_logexp`) participants. According to the model, the difference between decrease in non-seasonal and seasonal activities' ratings across adulthood indicates possibly existing effect in SA ($\delta_{nonseasonal-seasonal}$ = `r sub(" .*", "", subset(comps_phys, diff == '85 - 30' & diff2 == 'FALSE - TRUE' & SA == 'SA')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & diff2 == 'FALSE - TRUE' & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & diff2 == 'FALSE - TRUE' & SA == 'nonSA')$pd_logexp`) and likely existing effect in non-SA ($\delta_{nonseasonal-seasonal}$ = `r sub(" .*", "", subset(comps_phys, diff == '85 - 30' & diff2 == 'FALSE - TRUE' & SA == 'nonSA')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & diff2 == 'FALSE - TRUE' & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & diff2 == 'FALSE - TRUE' & SA == 'nonSA')$pd_logexp`) participants. These trends do not significantly differ between SA and non-SA participants in neither non-seasonal ($\delta_{SA-nonSA}$ = `r sub(" .*", "", subset(comps_phys, diff == '85 - 30' & diff2 == 'SA - nonSA' & season == FALSE)$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & diff2 == 'SA - nonSA' & season == FALSE)$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & diff2 == 'SA - nonSA' & season == FALSE)$pd_logexp`) nor seasonal ($\delta_{SA-nonSA}$ = `r sub(" .*", "", subset(comps_phys, diff == '85 - 30' & diff2 == 'SA - nonSA' & season == TRUE)$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & diff2 == 'SA - nonSA' & season == TRUE)$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & diff2 == 'SA - nonSA' & season == TRUE)$pd_logexp`) physical activities. 
+Finally, posterior expected intensity ratings predicted by the *"physical activities model"* are summarised in @fig-physical-cond-means and @tbl-physical-cond-means. According to the model and data, self-reported intensity of non-seasonal physical activities decreases with age more slowly than intensity of seasonal physical activities (left panel of @fig-physical-cond-means). Although SA and non-SA participants report similar levels of non-seasonal physical activities, SA participants report relatively lower intensities of seasonal physical activities across the adult life (right panel of @fig-physical-cond-means). Pairwise comparisons of expected intensity ratings between half-decades of life conditional on SA status and seasoness are presented in @tbl-physical-pair-comps. The model predicts that average intensity ratings of physical non-seasonal activities decrease between 85 and 30 years of age by `r sub( "-", "", sub(" .*", "", subset(comps_phys, diff == '85 - 30' & season == FALSE & SA == 'SA')$Estimate_logexp) )` points in SA (95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & season == FALSE & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & season == FALSE & SA == 'SA')$pd_logexp`) and by `r sub( "-", "", sub(" .*", "", subset(comps_phys, diff == '85 - 30' & season == FALSE & SA == 'nonSA')$Estimate_logexp) )` points in non-SA (95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & season == FALSE & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & season == FALSE & SA == 'nonSA')$pd_logexp`) participants. On the other, it predicts that average intensity ratings of seasonal physical activities decrease between 85 and 30 years of age by `r sub( "-", "", sub(" .*", "", subset(comps_phys, diff == '85 - 30' & season == TRUE & SA == 'SA')$Estimate_logexp) )` points in SA (95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & season == TRUE & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & season == TRUE & SA == 'SA')$pd_logexp`) and by `r sub( "-", "", sub(" .*", "", subset(comps_phys, diff == '85 - 30' & season == TRUE & SA == 'nonSA')$Estimate_logexp) )` points in non-SA (95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & season == TRUE & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & season == TRUE & SA == 'nonSA')$pd_logexp`) participants. According to the model, the difference between decrease in non-seasonal and seasonal activities' ratings across adulthood indicates possibly existing association in SA ($\delta_{nonseasonal-seasonal}$ = `r sub(" .*", "", subset(comps_phys, diff == '85 - 30' & diff2 == 'FALSE - TRUE' & SA == 'SA')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & diff2 == 'FALSE - TRUE' & SA == 'SA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & diff2 == 'FALSE - TRUE' & SA == 'SA')$pd_logexp`) and probably existing association in non-SA ($\delta_{nonseasonal-seasonal}$ = `r sub(" .*", "", subset(comps_phys, diff == '85 - 30' & diff2 == 'FALSE - TRUE' & SA == 'nonSA')$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & diff2 == 'FALSE - TRUE' & SA == 'nonSA')$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & diff2 == 'FALSE - TRUE' & SA == 'nonSA')$pd_logexp`) participants. These trends do not significantly differ between SA and non-SA participants in either non-seasonal ($\delta_{SA-nonSA}$ = `r sub(" .*", "", subset(comps_phys, diff == '85 - 30' & diff2 == 'SA - nonSA' & season == FALSE)$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & diff2 == 'SA - nonSA' & season == FALSE)$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & diff2 == 'SA - nonSA' & season == FALSE)$pd_logexp`) or seasonal ($\delta_{SA-nonSA}$ = `r sub(" .*", "", subset(comps_phys, diff == '85 - 30' & diff2 == 'SA - nonSA' & season == TRUE)$Estimate_logexp)`, 95% ETI `r paste( strsplit(subset(comps_phys, diff == '85 - 30' & diff2 == 'SA - nonSA' & season == TRUE)$Estimate_logexp, " ")[[1]][2:3], collapse = " ")`, *pd* = `r subset(comps_phys, diff == '85 - 30' & diff2 == 'SA - nonSA' & season == TRUE)$pd_logexp`) physical activities. 
 
-![Three-way interaction between decade of life, SuperAging, and seasoness in a model of self-reported physical leisure activities ratings.](../figures/conditional_means_physical_back_transformed_raw_scale.jpg){#fig-physical-cond-means}
+![Three-way interaction between half-decade of life, SuperAging, and seasoness in a model of self-reported physical leisure activities ratings.](../figures/_conditional_means_physical_back_transformed_raw_scale.jpg){#fig-physical-cond-means}
 
 # Appendix
 
@@ -273,7 +285,7 @@ Finally, posterior expected intensity ratings of the *'physical activities model
 #| label: tbl-vls-reli
 #| tbl-cap: Confirmatory factor analyses and internal consistency estimates of the VLS-ALQ scale
 
-read.csv(here("tables","vls_reliabilities.csv"), sep = ",") %>%
+tab_a1 <- read.csv(here("tables","_vls_reliabilities.csv"), sep = ",") %>%
 
   mutate(
     across( all_of("npar"), ~ rprint(.x, 0) ),
@@ -312,15 +324,21 @@ read.csv(here("tables","vls_reliabilities.csv"), sep = ",") %>%
     source_note = "N: number of participants; K: number of parameters of the confirmatory factor analysis model; RMSEA: root-mean-square error approximation; CI: confidence interval; CFI: comparative fit index, TLI: Tucker-Lewis Index; raw: Cronbach's alpha; based upon the covariances; stand.: Cronbach's alpha; based upon the correlations, G6: Guttman's lambda; 6 reliability; r: the average inter-item correlation; for RMSEA, values less than 0.08 indicating an adequate model fit (especially values of upper 90% CI bound lower than 0.08), for CFI and TLI, values exceeding 0.90 are considered to indicate a good model fit."
   )
 
+# save & show it
+gtsave( data = tab_a1, filename = here("tables","_Table_A1.docx") )
+tab_a1
+
 ```
 
 ```{r}
 #| label: tbl-la-nums-physical
 #| tbl-cap: Number of participants reporting at least one seasonal or non-seasonal physical activity of each type
 
-rbind.data.frame(
-  read.csv(here("tables","la_non-seasonal_participants_numbers.csv"), sep = ",") %>% filter(Type == "physical") %>% mutate(season = "Non-seasonal"),
-  read.csv(here("tables","la_seasonal_participants_numbers.csv"), sep = ",") %>% filter(Type == "physical") %>% mutate(season = "Seasonal")
+tab_a2 <- rbind.data.frame(
+  
+  read.csv(here("tables","_la_non-seasonal_participants_numbers.csv"), sep = ",") %>% filter(Type == "physical") %>% mutate(season = "Non-seasonal"),
+  read.csv(here("tables","_la_seasonal_participants_numbers.csv"), sep = ",") %>% filter(Type == "physical") %>% mutate(season = "Seasonal")
+
 ) %>%
   
   select( -ends_with("SA"), -Type ) %>%
@@ -334,13 +352,17 @@ rbind.data.frame(
     nonSA_perc~"non-SA"
   )
 
+# save & show it
+gtsave( data = tab_a2, filename = here("tables","_Table_A2.docx") )
+tab_a2
+
 ```
 
 ```{r}
 #| label: tbl-nonseasonal-cond-means
-#| tbl-cap: Conditional expectations of self-reported non-seasonal activity intensities stratified by the decade of life, SuperAging status, and activity modality
+#| tbl-cap: Conditional expectations of self-reported non-seasonal activity intensities stratified by the half-decade of life, SuperAging status, and activity modality
 
-read.csv(here("tables","la_nonseasonal_conditional_means.csv"), sep = ",") %>%
+tab_a3 <- read.csv(here("tables","_la_nonseasonal_conditional_means.csv"), sep = ",") %>%
   
   # prepare data
   filter(scale == "explog") %>%
@@ -368,20 +390,25 @@ read.csv(here("tables","la_nonseasonal_conditional_means.csv"), sep = ",") %>%
   # finish the columns
   cols_align(columns = "Decade", align = "left") %>%
   cols_align(columns = -2:-1, align = "center") %>%
-  cols_label(contains("Estimate") ~ "Estimate", contains("ETI") ~ "95% ETI")
+  cols_label(contains("Estimate") ~ "Estimate", contains("ETI") ~ "95% ETI", Decade ~ "Half-decade")
+
+# save & show it
+gtsave( data = tab_a3, filename = here("tables","_Table_A3.docx") )
+tab_a3
 
 ```
 
 ```{r}
 #| label: tbl-nonseasonal-pair-comps
-#| tbl-cap: Pairwise comparisons of self-reported non-seasonal activity intensities across decades of life stratified by SuperAging status, and activity modality
+#| tbl-cap: Pairwise comparisons of self-reported non-seasonal activity intensities across half-decades of life stratified by SuperAging status, and activity modality
 
-comps_nsea %>%
+tab_a4 <- comps_nsea %>%
   
   # pre-format
   filter( !grepl("[A-Za-z]", diff) ) %>%
   filter( is.na(diff2) ) %>%
   filter( !is.na(SA) ) %>%
+  filter( !is.na(actype) ) %>%
   mutate(
     actype = paste0(capitalise(actype)," activities"),
     SA = sub("non","non-",SA)
@@ -402,18 +429,22 @@ comps_nsea %>%
   cols_align(columns = "diff", align = "left") %>%
   cols_align(columns = -2:-1, align = "center") %>%
   cols_label(
-    diff ~ "Decade",
+    diff ~ "Half-decade",
     contains("Estimate") ~ "Estimate [95% ETI]", 
     contains("pd") ~ "pd"
   )
+
+# save & show it
+gtsave( data = tab_a4, filename = here("tables","_Table_A4.docx") )
+tab_a4
 
 ```
 
 ```{r}
 #| label: tbl-physical-cond-means
-#| tbl-cap: Conditional expectations of self-reported physical activity intensities stratified by the decade of life, SuperAging status, and seasoness
+#| tbl-cap: Conditional expectations of self-reported physical activity intensities stratified by the half-decade of life, SuperAging status, and seasoness
 
-read.csv(here("tables","la_physical_conditional_means.csv"), sep = ",") %>%
+tab_a5 <- read.csv(here("tables","_la_physical_conditional_means.csv"), sep = ",") %>%
   
   # prepare data
   filter(scale == "explog") %>%
@@ -441,22 +472,27 @@ read.csv(here("tables","la_physical_conditional_means.csv"), sep = ",") %>%
   # finish the columns
   cols_align(columns = "Decade", align = "left") %>%
   cols_align(columns = -2:-1, align = "center") %>%
-  cols_label(contains("Estimate") ~ "Estimate", contains("ETI") ~ "95% ETI")
+  cols_label(contains("Estimate") ~ "Estimate", contains("ETI") ~ "95% ETI", Decade ~ "Half-decade")
+
+# save & show it
+gtsave( data = tab_a5, filename = here("tables","_Table_A5.docx") )
+tab_a5
 
 ```
 
 ```{r}
 #| label: tbl-physical-pair-comps
-#| tbl-cap: Pairwise comparisons of self-reported physical activity intensities across decades of life stratified by SuperAging status, and seasoness
+#| tbl-cap: Pairwise comparisons of self-reported physical activity intensities across half-decades of life stratified by SuperAging status, and seasoness
 
-comps_phys %>%
+tab_a6 <- comps_phys %>%
   
   # pre-format
   filter( !grepl("[A-Za-z]", diff) ) %>%
   filter( is.na(diff2) ) %>%
   filter( !is.na(SA) ) %>%
+  filter( !is.na(season) ) %>%
   mutate(
-   season = case_when(season == TRUE ~ "Seasonal", season == FALSE ~ "Non-seasonal"),,
+   season = case_when(season == TRUE ~ "Seasonal", season == FALSE ~ "Non-seasonal"),
    SA = sub("non","non-",SA)
   ) %>%
   select(-ends_with("log"), -timebin, -diff2) %>%
@@ -475,21 +511,27 @@ comps_phys %>%
   cols_align(columns = "diff", align = "left") %>%
   cols_align(columns = -2:-1, align = "center") %>%
   cols_label(
-    diff ~ "Decade",
+    diff ~ "Half-decade",
     contains("Estimate") ~ "Estimate [95% ETI]", 
     contains("pd") ~ "pd"
   )
 
+# save & show it
+gtsave( data = tab_a6, filename = here("tables","_Table_A6.docx") )
+tab_a6
+
 ```
 
-![](../figures/ppc_stat_mean_nonseasonal_ordered_time.jpg){#fig-ppc-nonseasonal-mean}
+![](../figures/_ppc_stat_mean_nonseasonal_ordered_time.jpg){#fig-ppc-nonseasonal-mean}
 
-![](../figures/ppc_stat_sd_nonseasonal_ordered_time.jpg){#fig-ppc-nonseasonal-sd}
+![](../figures/_ppc_stat_sd_nonseasonal_ordered_time.jpg){#fig-ppc-nonseasonal-sd}
 
-![](../figures/ppc_density_nonseasonal_ordered_time.jpg){#fig-ppc-nonseasonal-dens}
+![](../figures/_ppc_density_nonseasonal_ordered_time.jpg){#fig-ppc-nonseasonal-dens}
 
-![](../figures/ppc_stat_mean_physical_ordered_time.jpg){#fig-ppc-physical-mean}
+![](../figures/_ppc_stat_mean_physical_ordered_time.jpg){#fig-ppc-physical-mean}
 
-![](../figures/ppc_stat_sd_physical_ordered_time.jpg){#fig-ppc-physical-sd}
+![](../figures/_ppc_stat_sd_physical_ordered_time.jpg){#fig-ppc-physical-sd}
 
-![](../figures/ppc_density_physical_ordered_time.jpg){#fig-ppc-physical-dens}
+![](../figures/_ppc_density_physical_ordered_time.jpg){#fig-ppc-physical-dens}
+
+# References

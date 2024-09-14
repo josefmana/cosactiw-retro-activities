@@ -197,7 +197,7 @@ write.table(
     
     do.call( rbind.data.frame, . ),
   
-  file = here("tables","la_psis_loo_model_comparisons.csv"),
+  file = here("tables","_la_psis_loo_model_comparisons.csv"),
   row.names = F,
   quote = F,
   sep = ","

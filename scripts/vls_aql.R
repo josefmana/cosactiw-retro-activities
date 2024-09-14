@@ -132,7 +132,7 @@ icons <-
 
 write.table(
   x = left_join(cfind, icons, by = "Scale"),
-  file = here("tables","vls_reliabilities.csv"),
+  file = here("tables","_vls_reliabilities.csv"),
   sep = ",",
   row.names = F,
   quote = F
@@ -185,7 +185,7 @@ write.table(
       
     ),
   
-  file = here("tables","vls_sum_scores.csv"),
+  file = here("tables","_vls_sum_scores.csv"),
   sep = ";",
   row.names = F,
   quote = F

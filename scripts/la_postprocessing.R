@@ -112,7 +112,7 @@ lapply(
     # save it
     ggsave(
       plot = last_plot(),
-      filename = here( "figures", paste0("ppc_density_",i,"_ordered_time.jpg") ),
+      filename = here( "figures", paste0("_ppc_density_",i,"_ordered_time.jpg") ),
       dpi = 300,
       width = 12.6,
       height = 13.3
@@ -143,7 +143,7 @@ lapply(
         # save it
         ggsave(
           plot = last_plot(),
-          filename = here( "figures", paste0("ppc_stat_",j,"_",i,"_ordered_time.jpg") ),
+          filename = here( "figures", paste0("_ppc_stat_",j,"_",i,"_ordered_time.jpg") ),
           dpi = 300,
           width = 12.6,
           height = 13.3
@@ -259,7 +259,7 @@ lapply(
     
     write.table(
       x = post_sum[[i]],
-      file = here( "tables", paste0("la_",i,"_conditional_means.csv") ),
+      file = here( "tables", paste0("_la_",i,"_conditional_means.csv") ),
       sep = ",",
       row.names = F,
       quote = F
@@ -329,7 +329,7 @@ lapply(
       )
     
     # prepare filename
-    fn <- paste0("conditional_means_nonseasonal_", gsub("-| ","_", i),"_scale.jpg")
+    fn <- paste0("_conditional_means_nonseasonal_", gsub("-| ","_", i),"_scale.jpg")
     
     # save it
     ggsave(
@@ -402,7 +402,7 @@ lapply(
       )
     
     # prepare filename
-    fn <- paste0("conditional_means_physical_", gsub("-| ","_", i),"_scale.jpg")
+    fn <- paste0("_conditional_means_physical_", gsub("-| ","_", i),"_scale.jpg")
     
     # save it
     ggsave(
@@ -635,7 +635,7 @@ write.table(
     pivot_wider( names_from = scale, values_from = c(Estimate, pd) ) %>%
     relocate(pd_log, .after = Estimate_log),
   
-  file = here("tables","la_nonseasonal_pairwise_comparisons.csv"),
+  file = here("tables","_la_nonseasonal_pairwise_comparisons.csv"),
   row.names = F,
   quote = F,
   sep = ";"
@@ -754,7 +754,7 @@ write.table(
     pivot_wider( names_from = scale, values_from = c(Estimate, pd) ) %>%
     relocate(pd_log, .after = Estimate_log),
   
-  file = here("tables","la_physical_pairwise_comparisons.csv"),
+  file = here("tables","_la_physical_pairwise_comparisons.csv"),
   row.names = F,
   quote = F,
   sep = ";"

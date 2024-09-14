@@ -172,7 +172,7 @@ tab1 <- sapply(
   )
 
 # save the table as .csv
-write.table(x = tab1, file = here("tables","la_activities_counts.csv"), sep = ";", row.names = F, quote = F)
+write.table(x = tab1, file = here("tables","_la_activities_counts.csv"), sep = ";", row.names = F, quote = F)
 
 
 ### tables of the number of participants reporting at least one activity in a category ----
@@ -195,7 +195,7 @@ lapply(
     mutate( across(ends_with("SA"), ~ paste0(.x, " (", rprint( 100 * .x/n[cur_column()], 0),"%)"), .names = "{col}_perc") ) %>%
     rownames_to_column("Category") %>%
     write.table(
-      file = here( "tables", paste0("la_",x,"_participants_numbers.csv") ),
+      file = here( "tables", paste0("_la_",x,"_participants_numbers.csv") ),
       sep = ",",
       row.names = F,
       quote = F
@@ -219,7 +219,7 @@ lapply(
           
           # contingency table to be analysed
           contab <-
-            read.csv( here( "tables", paste0("la_",i,"_participants_numbers.csv") ) ) %>%
+            read.csv( here( "tables", paste0("_la_",i,"_participants_numbers.csv") ) ) %>%
             mutate(sum = SA + nonSA) %>% # drop zero-sum rows
             filter(Type == x & sum > 0) %>%
             select( ends_with("SA") ) %>%
@@ -249,7 +249,7 @@ lapply(
   do.call( rbind.data.frame, . ) %>%
   mutate_all(unlist, use.names = F) %>%
   write.table(
-    file = here("tables","la_participants_numbers_chisquared.csv"),
+    file = here("tables","_la_participants_numbers_chisquared.csv"),
     sep = ",",
     row.names = F,
     quote = F
@@ -307,7 +307,7 @@ lapply(
     # save it
     ggsave(
       plot = last_plot(),
-      filename = here( "figures", paste0("la_",x,"_activities_counts.jpg") ),
+      filename = here( "figures", paste0("_la_",x,"_activities_counts.jpg") ),
       dpi = 300,
       width = 12.6,
       height = 13.3
